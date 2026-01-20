@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Puffs Eternal</title>
+    <meta
+      name="description"
+      content="A lightweight hub for Puffs friends and castmates to share announcements, messages, plays, auditions, and events."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Inter:wght@400;500;600;700&family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="hero-banner">
+        <div class="banner-content">
+          <span class="banner-badge">Third or Nothing!</span>
+          <span class="banner-text">Hufflepuff heart, forever third.</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <div class="logo">Puffs Eternal</div>
+        <div class="nav-links">
+          <a href="#announcements">Announcements</a>
+          <a href="#messages">Messages</a>
+          <a href="#plays">Plays & Auditions</a>
+          <a href="#events">Events</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div class="auth-status" data-auth="signed-in">
+          <span class="user-badge" id="userBadge">Signed in</span>
+          <button class="button ghost small" id="signOutBtn" type="button">
+            Sign out
+          </button>
+        </div>
+        <a class="cta" href="#contact" data-auth="signed-in">Share an Update</a>
+      </nav>
+      <div
+        class="admin-bar"
+        data-auth="signed-in"
+        data-role="editor"
+        data-role-display="flex"
+      >
+        <span class="admin-label">Editor tools</span>
+        <button class="button ghost small" id="toggleEditMode" type="button">
+          Enable edit mode
+        </button>
+        <button class="button small" type="button" data-add="announcements">
+          New announcement
+        </button>
+        <button class="button small" type="button" data-add="messages">
+          New message
+        </button>
+        <button class="button small" type="button" data-add="events">
+          New event
+        </button>
+        <button class="button small" type="button" data-add="shows">
+          Add show
+        </button>
+        <button class="button small" type="button" data-add="auditions">
+          Add audition
+        </button>
+        <button class="button ghost small" id="inviteEditor" type="button">
+          Invite editor
+        </button>
+        <button class="button ghost small" id="seedDemo" type="button">
+          Seed demo content
+        </button>
+        <button class="button ghost small" id="saveEdits" type="button">
+          Save changes
+        </button>
+        <button class="button ghost small" id="cancelEdits" type="button">
+          Cancel
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <p class="eyebrow">Hufflepuff heart, forever third.</p>
+          <h1>Third or Nothing!</h1>
+          <p class="tagline">A lovable losers club with the loudest loyalty.</p>
+          <div class="icon-row">
+            <div class="icon-badge" title="Scarf pride">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 3h8l4 4v10l-4 4H6z" fill="#2c1b0f"/>
+                <path d="M8 5h6l3 3v8l-3 3H8z" fill="#f8d66d"/>
+                <path d="M9 9h6v2H9zm0 4h6v2H9z" fill="#2c1b0f"/>
+              </svg>
+            </div>
+            <div class="icon-badge" title="House badge">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2l8 3v6c0 5-4 9-8 11-4-2-8-6-8-11V5z" fill="#f8d66d"/>
+                <path d="M12 4l6 2v5c0 3.6-3 6.9-6 8.6-3-1.7-6-5-6-8.6V6z" fill="#2c1b0f"/>
+                <path d="M10 11l2-3 2 3-2 4z" fill="#f8d66d"/>
+              </svg>
+            </div>
+            <div class="icon-badge" title="Wand waves">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 18l8-8 2 2-8 8z" fill="#2c1b0f"/>
+                <path d="M16 6l2-2 2 2-2 2z" fill="#f8d66d"/>
+                <path d="M18 12l2-1 1 2-2 1z" fill="#f8d66d"/>
+              </svg>
+            </div>
+          </div>
+          <p class="lead">
+            Share announcements, message each other, post about shows and
+            auditions, and coordinate events in one cozy, chaos-friendly space.
+          </p>
+          <div class="hero-actions" data-auth="signed-in">
+            <a class="button primary" href="#announcements">See updates</a>
+            <a class="button ghost" href="#contact">Post something</a>
+          </div>
+          <div class="hero-actions" data-auth="signed-out">
+            <button class="button primary" type="button" id="googleSignIn">
+              Continue with Google
+            </button>
+            <button class="button ghost" type="button" id="facebookSignIn">
+              Continue with Facebook
+            </button>
+          </div>
+          <div
+            class="access-note"
+            data-auth="signed-in"
+            data-role="viewer"
+            data-role-display="block"
+          >
+            You have view-only access. Ask an admin for editor access to post.
+          </div>
+          <div class="hero-tags">
+            <span>Announcements</span>
+            <span>Messages</span>
+            <span>Shows</span>
+            <span>Auditions</span>
+            <span>Events</span>
+          </div>
+        </div>
+        <div class="hero-card auth-card">
+          <div class="crest">
+            <div class="crest-ring">
+              <div class="crest-inner">
+                <span class="crest-title">PUFFS</span>
+                <span class="crest-subtitle">Eternal</span>
+              </div>
+            </div>
+          </div>
+          <h3>Third place, first-rate updates</h3>
+          <p>
+            Sign in to see the latest announcements and share your news with the
+            crew.
+          </p>
+          <div class="auth-buttons" data-auth="signed-out">
+            <button class="button primary" type="button" id="googleSignInAlt">
+              Sign in with Google
+            </button>
+            <button class="button ghost" type="button" id="facebookSignInAlt">
+              Sign in with Facebook
+            </button>
+          </div>
+          <div class="auth-confirm" data-auth="signed-in">
+            <p class="meta">You are signed in. Scroll down to see updates.</p>
+            <a class="button small" href="#announcements">Go to updates</a>
+          </div>
+        </div>
+      </section>
+
+      <div data-auth="signed-in">
+        <section id="announcements" class="section">
+          <div class="section-header">
+            <h2>Announcements</h2>
+            <p>Big news, milestones, and shoutouts.</p>
+          </div>
+          <div class="card-grid" data-container="announcements">
+          </div>
+          <p class="empty-state" data-empty="announcements">
+            No announcements yet. Editors can post the first update.
+          </p>
+        </section>
+
+        <section id="messages" class="section alt">
+          <div class="section-header">
+            <h2>Messages</h2>
+            <p>Quick notes and hellos from the crew.</p>
+          </div>
+          <div class="message-board" data-container="messages">
+          </div>
+          <p class="empty-state" data-empty="messages">
+            No messages yet. Editors can post a hello.
+          </p>
+        </section>
+
+        <section id="plays" class="section">
+          <div class="section-header">
+            <h2>Plays & Auditions</h2>
+            <p>Post current shows, callbacks, and auditions.</p>
+          </div>
+          <div class="split">
+            <div class="card">
+              <h3>Shows we are in</h3>
+              <ul class="list" data-list-id="shows"></ul>
+              <p class="empty-state" data-empty="shows">
+                No shows posted yet.
+              </p>
+            </div>
+            <div class="card">
+              <h3>Auditions coming up</h3>
+              <ul class="list" data-list-id="auditions"></ul>
+              <p class="empty-state" data-empty="auditions">
+                No auditions posted yet.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="events" class="section alt">
+          <div class="section-header">
+            <h2>Events</h2>
+            <p>Reunions, watch parties, and hangouts.</p>
+          </div>
+          <div class="timeline" data-container="events">
+          </div>
+          <p class="empty-state" data-empty="events">
+            No events yet. Editors can add the first hangout.
+          </p>
+        </section>
+
+        <section id="contact" class="section">
+          <div class="section-header">
+            <h2>Share an update</h2>
+            <p>
+              Send a note to the group. This is a lightweight form that can be
+              wired to email or a service later.
+            </p>
+          </div>
+          <form class="contact-form">
+            <label>
+              Your name
+              <input type="text" name="name" placeholder="Alex" />
+            </label>
+            <label>
+              What kind of update is this?
+              <select name="type">
+                <option>Announcement</option>
+                <option>Message</option>
+                <option>Show or audition</option>
+                <option>Event</option>
+              </select>
+            </label>
+            <label>
+              Your update
+              <textarea
+                name="message"
+                rows="4"
+                placeholder="Share details, dates, and links."
+              ></textarea>
+            </label>
+            <button class="button primary" type="button" data-toast="true">
+              Send update
+            </button>
+            <p class="form-note">
+              This demo form is front-end only. Hook it up to an email service or
+              backend when ready.
+            </p>
+          </form>
+          <div class="footer-note">
+            Want a private members-only space? Add a password or host behind
+            trusted invites.
+          </div>
+        </section>
+      </div>
+
+      <section class="section locked" data-auth="signed-out">
+        <div class="section-header">
+          <h2>Sign in to see updates</h2>
+          <p>
+            Once you sign in with Google or Facebook, you will get access to the
+            latest announcements, messages, auditions, and events.
+          </p>
+        </div>
+        <div class="locked-card">
+          <p>
+            This space is reserved for the Puffs community. Sign in to join the
+            conversation.
+          </p>
+          <div class="auth-buttons">
+            <button class="button primary" type="button" id="googleSignInLock">
+              Continue with Google
+            </button>
+            <button class="button ghost" type="button" id="facebookSignInLock">
+              Continue with Facebook
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Puffs Eternal · Third or Nothing!</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
