@@ -36,6 +36,21 @@ This site uses Firebase Auth via CDN. To enable it:
 For Facebook auth, you will also need a Facebook app ID and secret configured
 inside Firebase Auth.
 
+## Netlify deployment (recommended)
+
+This repo ships with a Netlify build step that generates `config.js` from
+environment variables. In Netlify, set these variables:
+
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_STORAGE_BUCKET`
+- `FIREBASE_MESSAGING_SENDER_ID`
+- `FIREBASE_APP_ID`
+- `FIREBASE_MEASUREMENT_ID`
+
+Netlify will run `node scripts/generate-config.js` and publish the site.
+
 ## Firestore setup (multi-user)
 
 This site uses Firestore for shared content across all users.
