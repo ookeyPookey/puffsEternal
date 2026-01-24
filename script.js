@@ -15,6 +15,15 @@ const signOutBtn = document.getElementById("signOutBtn");
 const userBadge = document.getElementById("userBadge");
 const authSections = document.querySelectorAll("[data-auth]");
 const emptyStates = document.querySelectorAll("[data-empty]");
+const postForm = document.getElementById("postForm");
+const postType = document.getElementById("postType");
+const postTitleField = document.getElementById("postTitleField");
+const postBodyField = document.getElementById("postBodyField");
+const postListField = document.getElementById("postListField");
+const postTitle = document.getElementById("postTitle");
+const postBody = document.getElementById("postBody");
+const postListItem = document.getElementById("postListItem");
+const postName = postForm?.querySelector('input[name="name"]');
 
 const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
 
@@ -33,6 +42,7 @@ let currentUser = null;
 let isEditor = false;
 let listeners = [];
 let editorInviteUnsubscribe = null;
+let deleteHandlerWired = false;
 
 const showToast = (message) => {
   const toast = document.createElement("div");
@@ -161,6 +171,23 @@ const clearContainers = () => {
   setEmptyState("auditions", false);
 };
 
+const updatePostFields = () => {
+  if (!postType) {
+    return;
+  }
+  const type = postType.value;
+  const isListType = type === "shows" || type === "auditions";
+  if (postTitleField) {
+    postTitleField.hidden = isListType;
+  }
+  if (postBodyField) {
+    postBodyField.hidden = isListType;
+  }
+  if (postListField) {
+    postListField.hidden = !isListType;
+  }
+};
+
 const renderAnnouncements = (docs) => {
   const container = document.querySelector('[data-container="announcements"]');
   if (!container) {
@@ -180,6 +207,9 @@ const renderAnnouncements = (docs) => {
       <h3 data-editable="true" data-field="title">${data.title || ""}</h3>
       <p data-editable="true" data-field="body">${data.body || ""}</p>
       <div class="meta">${meta}</div>
+      <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="announcements">
+        Delete
+      </button>
     `;
     container.appendChild(card);
   });
@@ -206,6 +236,9 @@ const renderMessages = (docs) => {
       <h4 data-editable="true" data-field="title">${data.title || ""}</h4>
       <p data-editable="true" data-field="body">${data.body || ""}</p>
       <span class="meta">${meta}</span>
+      <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="messages">
+        Delete
+      </button>
     `;
     container.appendChild(message);
   });
@@ -228,6 +261,9 @@ const renderEvents = (docs) => {
     eventItem.innerHTML = `
       <h4 data-editable="true" data-field="title">${data.title || ""}</h4>
       <p data-editable="true" data-field="body">${data.body || ""}</p>
+      <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="events">
+        Delete
+      </button>
     `;
     container.appendChild(eventItem);
   });
@@ -244,10 +280,14 @@ const renderList = (key, docs) => {
   docs.forEach((doc) => {
     const data = doc.data();
     const li = document.createElement("li");
-    li.textContent = data.text || "";
     li.dataset.docId = doc.id;
     li.dataset.itemType = key;
-    li.setAttribute("data-editable", "true");
+    li.innerHTML = `
+      <span data-editable="true" data-field="text">${data.text || ""}</span>
+      <button class="delete-button small" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="${key}">
+        Delete
+      </button>
+    `;
     list.appendChild(li);
   });
   setEmptyState(key, docs.length > 0);
@@ -301,6 +341,114 @@ const toggleEditMode = (enabled) => {
   }
 };
 
+const wireDeleteActions = () => {
+  if (deleteHandlerWired) {
+    return;
+  }
+  deleteHandlerWired = true;
+  document.addEventListener("click", async (event) => {
+    const button = event.target.closest('[data-action="delete"]');
+    if (!button) {
+      return;
+    }
+    if (!isEditor || !db) {
+      showToast("Only editors can delete.");
+      return;
+    }
+    const docId = button.dataset.docId;
+    const type = button.dataset.itemType;
+    if (!docId || !type) {
+      return;
+    }
+    const confirmed = window.confirm("Delete this item?");
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await db.collection(type).doc(docId).delete();
+      showToast("Deleted.");
+    } catch (error) {
+      showToast("Delete failed.");
+      console.error(error);
+    }
+  });
+};
+
+const wirePostForm = () => {
+  if (!postForm || !postType) {
+    return;
+  }
+  updatePostFields();
+  postType.addEventListener("change", updatePostFields);
+
+  postForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!db || !currentUser) {
+      showToast("Please sign in to post.");
+      return;
+    }
+
+    const type = postType.value;
+    const authorName =
+      postName?.value?.trim() ||
+      currentUser.displayName ||
+      currentUser.email ||
+      "Member";
+    const authorEmail = currentUser.email || null;
+
+    if (type === "shows" || type === "auditions") {
+      const text = postListItem?.value?.trim() || "";
+      if (!text) {
+        showToast("Please add an item.");
+        return;
+      }
+      try {
+        await db.collection(type).add({
+          text,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          authorName,
+          authorEmail,
+        });
+        if (postListItem) {
+          postListItem.value = "";
+        }
+        showToast("Posted.");
+      } catch (error) {
+        showToast("Could not post.");
+        console.error(error);
+      }
+      return;
+    }
+
+    const title = postTitle?.value?.trim() || "";
+    const body = postBody?.value?.trim() || "";
+    if (!title || !body) {
+      showToast("Please add a title and details.");
+      return;
+    }
+
+    try {
+      await db.collection(type).add({
+        title,
+        body,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        authorName,
+        authorEmail,
+      });
+      if (postTitle) {
+        postTitle.value = "";
+      }
+      if (postBody) {
+        postBody.value = "";
+      }
+      showToast("Posted.");
+    } catch (error) {
+      showToast("Could not post.");
+      console.error(error);
+    }
+  });
+};
+
 const saveEdits = async () => {
   if (!db || !isEditor) {
     return;
@@ -316,9 +464,13 @@ const saveEdits = async () => {
     }
 
     if (type === "shows" || type === "auditions") {
+      const textValue =
+        element.querySelector('[data-field="text"]')?.textContent ||
+        element.textContent ||
+        "";
       updates.push(
         db.collection(type).doc(docId).update({
-          text: element.textContent || "",
+          text: textValue.trim(),
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           updatedBy: currentUser?.email || null,
         })
@@ -608,4 +760,6 @@ toastTargets.forEach((button) => {
 });
 
 wireEditorTools();
+wireDeleteActions();
+wirePostForm();
 initAuth();

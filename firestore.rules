@@ -18,6 +18,36 @@ service cloud.firestore {
       allow write: if isEditor();
     }
 
+    match /announcements/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isEditor();
+    }
+
+    match /messages/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isEditor();
+    }
+
+    match /events/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isEditor();
+    }
+
+    match /shows/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isEditor();
+    }
+
+    match /auditions/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isEditor();
+    }
+
     match /{document=**} {
       allow read: if isSignedIn();
       allow write: if isEditor();

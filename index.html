@@ -239,34 +239,53 @@
               wired to email or a service later.
             </p>
           </div>
-          <form class="contact-form">
+          <form class="contact-form" id="postForm">
             <label>
               Your name
               <input type="text" name="name" placeholder="Alex" />
             </label>
             <label>
               What kind of update is this?
-              <select name="type">
-                <option>Announcement</option>
-                <option>Message</option>
-                <option>Show or audition</option>
-                <option>Event</option>
+              <select name="type" id="postType">
+                <option value="announcements">Announcement</option>
+                <option value="messages">Message</option>
+                <option value="events">Event</option>
+                <option value="shows">Play / show</option>
+                <option value="auditions">Audition</option>
               </select>
             </label>
-            <label>
+            <label id="postTitleField">
+              Title
+              <input
+                type="text"
+                name="title"
+                id="postTitle"
+                placeholder="Opening night hang"
+              />
+            </label>
+            <label id="postBodyField">
               Your update
               <textarea
                 name="message"
+                id="postBody"
                 rows="4"
                 placeholder="Share details, dates, and links."
               ></textarea>
             </label>
-            <button class="button primary" type="button" data-toast="true">
-              Send update
+            <label id="postListField">
+              Item
+              <input
+                type="text"
+                name="listItem"
+                id="postListItem"
+                placeholder="\"The Enchanted Forest\" — Feb 2-18"
+              />
+            </label>
+            <button class="button primary" type="submit">
+              Publish update
             </button>
             <p class="form-note">
-              This demo form is front-end only. Hook it up to an email service or
-              backend when ready.
+              Signed-in members can post. Editors can edit or remove items.
             </p>
           </form>
           <div class="footer-note">

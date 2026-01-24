@@ -67,3 +67,6 @@ allowlist in `firestore.rules`.
 
 Invites are stored in Firestore under `editorInvites/{email}`. Signed-in users
 check for their email doc on login to determine editor access.
+
+Signed-in members can create new announcements, messages, events, plays, and
+auditions. Editors can edit or delete any content.

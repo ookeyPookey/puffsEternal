@@ -487,6 +487,10 @@ main {
   font-weight: 500;
 }
 
+.contact-form label[hidden] {
+  display: none;
+}
+
 .contact-form input,
 .contact-form select,
 .contact-form textarea {
@@ -499,6 +503,31 @@ main {
 .form-note {
   font-size: 12px;
   color: #6b4b2a;
+}
+
+.edit-mode .delete-button {
+  display: inline-flex;
+}
+
+.delete-button {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: #2c1b0f;
+  color: #f8d66d;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.delete-button.small {
+  padding: 4px 8px;
+  font-size: 11px;
+  margin-left: 8px;
+  margin-top: 0;
 }
 
 .footer-note {
