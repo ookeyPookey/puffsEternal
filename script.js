@@ -50,7 +50,12 @@ const showToast = (message) => {
   }, 2500);
 };
 
+let authUnavailableWired = false;
 const wireAuthUnavailable = () => {
+  if (authUnavailableWired) {
+    return;
+  }
+  authUnavailableWired = true;
   const message =
     "Sign-in isn't configured yet. Add your Firebase keys and enable providers.";
   authButtons.google.forEach((button) => {
@@ -509,6 +514,8 @@ const wireEditorTools = () => {
 
 const initAuth = () => {
   if (!window.firebase) {
+    console.warn("Firebase scripts did not load.");
+    wireAuthUnavailable();
     return;
   }
 
@@ -524,7 +531,13 @@ const initAuth = () => {
     return;
   }
 
-  firebase.initializeApp(firebaseConfig);
+  try {
+    firebase.initializeApp(firebaseConfig);
+  } catch (error) {
+    console.error(error);
+    wireAuthUnavailable();
+    return;
+  }
   auth = firebase.auth();
   db = firebase.firestore();
   const googleProvider = new firebase.auth.GoogleAuthProvider();
