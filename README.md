@@ -31,11 +31,7 @@ This site uses Firebase Auth via CDN. To enable it:
 1. Create a Firebase project.
 2. Enable Google and/or Facebook providers in Firebase Auth.
 3. Add your app's domain to the authorized domains list.
-4. Replace the placeholders in `script.js`:
-   - `apiKey`
-   - `authDomain`
-   - `projectId`
-   - `appId`
+4. Copy `config.example.js` to `config.js` and fill in your Firebase config.
 
 For Facebook auth, you will also need a Facebook app ID and secret configured
 inside Firebase Auth.

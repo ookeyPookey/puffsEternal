@@ -16,15 +16,7 @@ const userBadge = document.getElementById("userBadge");
 const authSections = document.querySelectorAll("[data-auth]");
 const emptyStates = document.querySelectorAll("[data-empty]");
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB7YG0xyk0iYWV13x8jcVtTb_UHjldCLhI",
-  authDomain: "puffs-eternal.firebaseapp.com",
-  projectId: "puffs-eternal",
-  storageBucket: "puffs-eternal.firebasestorage.app",
-  messagingSenderId: "157307571255",
-  appId: "1:157307571255:web:0a82f976f9e9e8d67183b2",
-  measurementId: "G-E1FNYVDVKQ",
-};
+const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
 
 const collections = {
   announcements: "announcements",
