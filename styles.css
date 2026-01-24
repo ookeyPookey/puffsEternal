@@ -333,6 +333,7 @@ main {
 
 .section {
   padding: 50px 0;
+  scroll-margin-top: 140px;
 }
 
 .section.alt {

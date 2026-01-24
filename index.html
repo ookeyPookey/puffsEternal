@@ -171,129 +171,142 @@
         </div>
       </section>
 
-      <div data-auth="signed-in">
-        <section id="announcements" class="section">
-          <div class="section-header">
-            <h2>Announcements</h2>
-            <p>Big news, milestones, and shoutouts.</p>
-          </div>
-          <div class="card-grid" data-container="announcements">
-          </div>
-          <p class="empty-state" data-empty="announcements">
-            No announcements yet. Editors can post the first update.
-          </p>
-        </section>
+      <section id="announcements" class="section">
+        <div class="section-header">
+          <h2>Announcements</h2>
+          <p>Big news, milestones, and shoutouts.</p>
+        </div>
+        <div class="card-grid" data-container="announcements" data-auth="signed-in">
+        </div>
+        <p class="empty-state" data-empty="announcements" data-auth="signed-in">
+          No announcements yet. Editors can post the first update.
+        </p>
+        <p class="empty-state" data-auth="signed-out">
+          Sign in to see announcements from the crew.
+        </p>
+      </section>
 
-        <section id="messages" class="section alt">
-          <div class="section-header">
-            <h2>Messages</h2>
-            <p>Quick notes and hellos from the crew.</p>
-          </div>
-          <div class="message-board" data-container="messages">
-          </div>
-          <p class="empty-state" data-empty="messages">
-            No messages yet. Editors can post a hello.
-          </p>
-        </section>
+      <section id="messages" class="section alt">
+        <div class="section-header">
+          <h2>Messages</h2>
+          <p>Quick notes and hellos from the crew.</p>
+        </div>
+        <div class="message-board" data-container="messages" data-auth="signed-in">
+        </div>
+        <p class="empty-state" data-empty="messages" data-auth="signed-in">
+          No messages yet. Editors can post a hello.
+        </p>
+        <p class="empty-state" data-auth="signed-out">
+          Sign in to see and post messages.
+        </p>
+      </section>
 
-        <section id="plays" class="section">
-          <div class="section-header">
-            <h2>Plays & Auditions</h2>
-            <p>Post current shows, callbacks, and auditions.</p>
-          </div>
-          <div class="split">
-            <div class="card">
-              <h3>Shows we are in</h3>
-              <ul class="list" data-list-id="shows"></ul>
-              <p class="empty-state" data-empty="shows">
-                No shows posted yet.
-              </p>
-            </div>
-            <div class="card">
-              <h3>Auditions coming up</h3>
-              <ul class="list" data-list-id="auditions"></ul>
-              <p class="empty-state" data-empty="auditions">
-                No auditions posted yet.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section id="events" class="section alt">
-          <div class="section-header">
-            <h2>Events</h2>
-            <p>Reunions, watch parties, and hangouts.</p>
-          </div>
-          <div class="timeline" data-container="events">
-          </div>
-          <p class="empty-state" data-empty="events">
-            No events yet. Editors can add the first hangout.
-          </p>
-        </section>
-
-        <section id="contact" class="section">
-          <div class="section-header">
-            <h2>Share an update</h2>
-            <p>
-              Send a note to the group. This is a lightweight form that can be
-              wired to email or a service later.
+      <section id="plays" class="section">
+        <div class="section-header">
+          <h2>Plays & Auditions</h2>
+          <p>Post current shows, callbacks, and auditions.</p>
+        </div>
+        <div class="split" data-auth="signed-in">
+          <div class="card">
+            <h3>Shows we are in</h3>
+            <ul class="list" data-list-id="shows"></ul>
+            <p class="empty-state" data-empty="shows">
+              No shows posted yet.
             </p>
           </div>
-          <form class="contact-form" id="postForm">
-            <label>
-              Your name
-              <input type="text" name="name" placeholder="Alex" />
-            </label>
-            <label>
-              What kind of update is this?
-              <select name="type" id="postType">
-                <option value="announcements">Announcement</option>
-                <option value="messages">Message</option>
-                <option value="events">Event</option>
-                <option value="shows">Play / show</option>
-                <option value="auditions">Audition</option>
-              </select>
-            </label>
-            <label id="postTitleField">
-              Title
-              <input
-                type="text"
-                name="title"
-                id="postTitle"
-                placeholder="Opening night hang"
-              />
-            </label>
-            <label id="postBodyField">
-              Your update
-              <textarea
-                name="message"
-                id="postBody"
-                rows="4"
-                placeholder="Share details, dates, and links."
-              ></textarea>
-            </label>
-            <label id="postListField">
-              Item
-              <input
-                type="text"
-                name="listItem"
-                id="postListItem"
-                placeholder="\"The Enchanted Forest\" — Feb 2-18"
-              />
-            </label>
-            <button class="button primary" type="submit">
-              Publish update
-            </button>
-            <p class="form-note">
-              Signed-in members can post. Editors can edit or remove items.
+          <div class="card">
+            <h3>Auditions coming up</h3>
+            <ul class="list" data-list-id="auditions"></ul>
+            <p class="empty-state" data-empty="auditions">
+              No auditions posted yet.
             </p>
-          </form>
-          <div class="footer-note">
-            Want a private members-only space? Add a password or host behind
-            trusted invites.
           </div>
-        </section>
-      </div>
+        </div>
+        <p class="empty-state" data-auth="signed-out">
+          Sign in to see plays and auditions.
+        </p>
+      </section>
+
+      <section id="events" class="section alt">
+        <div class="section-header">
+          <h2>Events</h2>
+          <p>Reunions, watch parties, and hangouts.</p>
+        </div>
+        <div class="timeline" data-container="events" data-auth="signed-in">
+        </div>
+        <p class="empty-state" data-empty="events" data-auth="signed-in">
+          No events yet. Editors can add the first hangout.
+        </p>
+        <p class="empty-state" data-auth="signed-out">
+          Sign in to see upcoming events.
+        </p>
+      </section>
+
+      <section id="contact" class="section">
+        <div class="section-header">
+          <h2>Share an update</h2>
+          <p>
+            Send a note to the group. This is a lightweight form that can be
+            wired to email or a service later.
+          </p>
+        </div>
+        <form class="contact-form" id="postForm" data-auth="signed-in">
+          <label>
+            Your name
+            <input type="text" name="name" placeholder="Alex" />
+          </label>
+          <label>
+            What kind of update is this?
+            <select name="type" id="postType">
+              <option value="announcements">Announcement</option>
+              <option value="messages">Message</option>
+              <option value="events">Event</option>
+              <option value="shows">Play / show</option>
+              <option value="auditions">Audition</option>
+            </select>
+          </label>
+          <label id="postTitleField">
+            Title
+            <input
+              type="text"
+              name="title"
+              id="postTitle"
+              placeholder="Opening night hang"
+            />
+          </label>
+          <label id="postBodyField">
+            Your update
+            <textarea
+              name="message"
+              id="postBody"
+              rows="4"
+              placeholder="Share details, dates, and links."
+            ></textarea>
+          </label>
+          <label id="postListField">
+            Item
+            <input
+              type="text"
+              name="listItem"
+              id="postListItem"
+              placeholder="\"The Enchanted Forest\" — Feb 2-18"
+            />
+          </label>
+          <button class="button primary" type="submit">
+            Publish update
+          </button>
+          <p class="form-note">
+            Signed-in members can post. Editors can edit or remove items.
+          </p>
+        </form>
+        <p class="empty-state" data-auth="signed-out">
+          Sign in to publish updates.
+        </p>
+        <div class="footer-note">
+          Want a private members-only space? Add a password or host behind
+          trusted invites.
+        </div>
+      </section>
 
       <section class="section locked" data-auth="signed-out">
         <div class="section-header">
