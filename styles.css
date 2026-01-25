@@ -543,7 +543,7 @@ main {
 .media-card {
   color: #fff;
   background: #2c1b0f;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   min-height: 220px;
