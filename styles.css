@@ -543,9 +543,9 @@ main {
 .media-card {
   color: #fff;
   background: #2c1b0f;
-  background-image: var(--card-image);
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   min-height: 220px;
 }
 
