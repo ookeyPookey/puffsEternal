@@ -37,6 +37,13 @@ const resolveUrl = (baseUrl, candidate) => {
   }
 };
 
+const buildProxyUrl = (absoluteUrl) => {
+  if (!absoluteUrl) {
+    return "";
+  }
+  return `/.netlify/functions/image-proxy?url=${encodeURIComponent(absoluteUrl)}`;
+};
+
 exports.handler = async (event) => {
   const urlParam = event.queryStringParameters?.url || "";
   if (!urlParam) {
@@ -92,10 +99,11 @@ exports.handler = async (event) => {
       getMetaNameContent(html, "twitter:image") ||
       getMetaNameContent(html, "twitter:image:src");
     const resolvedImage = resolveUrl(parsedUrl.toString(), image.trim());
+    const proxiedImage = buildProxyUrl(resolvedImage);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ title: title.trim(), image: resolvedImage }),
+      body: JSON.stringify({ title: title.trim(), image: proxiedImage }),
     };
   } catch (error) {
     return {

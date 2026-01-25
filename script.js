@@ -178,6 +178,16 @@ const fetchLinkPreview = async (url) => {
   }
 };
 
+const buildProxyImageUrl = (url) => {
+  if (!url) {
+    return "";
+  }
+  if (url.startsWith("/.netlify/functions/image-proxy")) {
+    return url;
+  }
+  return `/.netlify/functions/image-proxy?url=${encodeURIComponent(url)}`;
+};
+
 const applyEditableState = (enabled) => {
   document.body.classList.toggle("edit-mode", enabled);
   document.querySelectorAll("[data-editable]").forEach((element) => {
@@ -232,14 +242,13 @@ const renderAnnouncements = (docs) => {
     card.className = "card";
     card.dataset.docId = doc.id;
     card.dataset.itemType = "announcements";
+    const imageUrl = data.linkImage
+      ? buildProxyImageUrl(data.linkImage)
+      : "";
     const linkMarkup = data.linkUrl
       ? `
         <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
-          ${
-            data.linkImage
-              ? `<img class="link-thumb" src="${data.linkImage}" alt="" loading="lazy" />`
-              : ""
-          }
+          ${imageUrl ? `<img class="link-thumb" src="${imageUrl}" alt="" loading="lazy" />` : ""}
           <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
           <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
         </a>
@@ -275,14 +284,13 @@ const renderMessages = (docs) => {
     message.className = "message";
     message.dataset.docId = doc.id;
     message.dataset.itemType = "messages";
+    const imageUrl = data.linkImage
+      ? buildProxyImageUrl(data.linkImage)
+      : "";
     const linkMarkup = data.linkUrl
       ? `
         <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
-          ${
-            data.linkImage
-              ? `<img class="link-thumb" src="${data.linkImage}" alt="" loading="lazy" />`
-              : ""
-          }
+          ${imageUrl ? `<img class="link-thumb" src="${imageUrl}" alt="" loading="lazy" />` : ""}
           <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
           <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
         </a>
@@ -315,14 +323,13 @@ const renderEvents = (docs) => {
     eventItem.className = "timeline-item";
     eventItem.dataset.docId = doc.id;
     eventItem.dataset.itemType = "events";
+    const imageUrl = data.linkImage
+      ? buildProxyImageUrl(data.linkImage)
+      : "";
     const linkMarkup = data.linkUrl
       ? `
         <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
-          ${
-            data.linkImage
-              ? `<img class="link-thumb" src="${data.linkImage}" alt="" loading="lazy" />`
-              : ""
-          }
+          ${imageUrl ? `<img class="link-thumb" src="${imageUrl}" alt="" loading="lazy" />` : ""}
           <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
           <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
         </a>
@@ -350,14 +357,13 @@ const renderList = (key, docs) => {
   list.innerHTML = "";
   docs.forEach((doc) => {
     const data = doc.data();
+    const imageUrl = data.linkImage
+      ? buildProxyImageUrl(data.linkImage)
+      : "";
     const linkMarkup = data.linkUrl
       ? `
         <a class="link-card small" href="${data.linkUrl}" target="_blank" rel="noreferrer">
-          ${
-            data.linkImage
-              ? `<img class="link-thumb" src="${data.linkImage}" alt="" loading="lazy" />`
-              : ""
-          }
+          ${imageUrl ? `<img class="link-thumb" src="${imageUrl}" alt="" loading="lazy" />` : ""}
           <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
           <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
         </a>
