@@ -847,8 +847,10 @@ const saveEdits = async () => {
       return;
     }
 
-    const title = element.querySelector('[data-field="title"]')?.textContent || "";
-    const body = element.querySelector('[data-field="body"]')?.textContent || "";
+    const title =
+      element.querySelector('[data-field="title"]')?.textContent || "";
+    const body =
+      element.querySelector('[data-field="body"]')?.textContent || "";
     const linkTitle =
       element.querySelector('[data-field="linkTitle"]')?.textContent || "";
     const linkUrlRaw =
@@ -856,8 +858,8 @@ const saveEdits = async () => {
     const linkUrl = normalizeUrl(linkUrlRaw.trim());
     updates.push(
       db.collection(type).doc(docId).update({
-        title,
-        body,
+        title: title.trim(),
+        body: body.trim(),
         linkTitle: linkTitle.trim(),
         linkUrl: linkUrl,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1174,7 +1176,7 @@ const initAuth = () => {
     } else {
       isEditor = false;
       if (userBadge) {
-        userBadge.textContent = "Signed in";
+        userBadge.textContent = "Signed out";
       }
       if (editorInviteUnsubscribe) {
         editorInviteUnsubscribe();
