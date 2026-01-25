@@ -469,6 +469,33 @@ main {
   opacity: 0.6;
 }
 
+.link-card {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #e6c45c;
+  background: #fff2bf;
+  color: #2c1b0f;
+}
+
+.link-card.small {
+  margin-top: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.link-title {
+  font-weight: 600;
+}
+
+.link-url {
+  font-size: 12px;
+  color: #6b4b2a;
+  word-break: break-all;
+}
+
 .split {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

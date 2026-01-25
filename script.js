@@ -23,6 +23,8 @@ const postListField = document.getElementById("postListField");
 const postTitle = document.getElementById("postTitle");
 const postBody = document.getElementById("postBody");
 const postListItem = document.getElementById("postListItem");
+const postLinkTitle = document.getElementById("postLinkTitle");
+const postLinkUrl = document.getElementById("postLinkUrl");
 const postName = postForm?.querySelector('input[name="name"]');
 
 const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
@@ -149,6 +151,16 @@ const formatDate = (timestamp) => {
   });
 };
 
+const normalizeUrl = (url) => {
+  if (!url) {
+    return "";
+  }
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+  return `https://${url}`;
+};
+
 const applyEditableState = (enabled) => {
   document.body.classList.toggle("edit-mode", enabled);
   document.querySelectorAll("[data-editable]").forEach((element) => {
@@ -203,9 +215,18 @@ const renderAnnouncements = (docs) => {
     card.className = "card";
     card.dataset.docId = doc.id;
     card.dataset.itemType = "announcements";
+    const linkMarkup = data.linkUrl
+      ? `
+        <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
+          <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
+          <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
+        </a>
+      `
+      : "";
     card.innerHTML = `
       <h3 data-editable="true" data-field="title">${data.title || ""}</h3>
       <p data-editable="true" data-field="body">${data.body || ""}</p>
+      ${linkMarkup}
       <div class="meta">${meta}</div>
       <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="announcements">
         Delete
@@ -232,9 +253,18 @@ const renderMessages = (docs) => {
     message.className = "message";
     message.dataset.docId = doc.id;
     message.dataset.itemType = "messages";
+    const linkMarkup = data.linkUrl
+      ? `
+        <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
+          <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
+          <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
+        </a>
+      `
+      : "";
     message.innerHTML = `
       <h4 data-editable="true" data-field="title">${data.title || ""}</h4>
       <p data-editable="true" data-field="body">${data.body || ""}</p>
+      ${linkMarkup}
       <span class="meta">${meta}</span>
       <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="messages">
         Delete
@@ -258,9 +288,18 @@ const renderEvents = (docs) => {
     eventItem.className = "timeline-item";
     eventItem.dataset.docId = doc.id;
     eventItem.dataset.itemType = "events";
+    const linkMarkup = data.linkUrl
+      ? `
+        <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
+          <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
+          <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
+        </a>
+      `
+      : "";
     eventItem.innerHTML = `
       <h4 data-editable="true" data-field="title">${data.title || ""}</h4>
       <p data-editable="true" data-field="body">${data.body || ""}</p>
+      ${linkMarkup}
       <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="events">
         Delete
       </button>
@@ -279,11 +318,20 @@ const renderList = (key, docs) => {
   list.innerHTML = "";
   docs.forEach((doc) => {
     const data = doc.data();
+    const linkMarkup = data.linkUrl
+      ? `
+        <a class="link-card small" href="${data.linkUrl}" target="_blank" rel="noreferrer">
+          <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
+          <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
+        </a>
+      `
+      : "";
     const li = document.createElement("li");
     li.dataset.docId = doc.id;
     li.dataset.itemType = key;
     li.innerHTML = `
       <span data-editable="true" data-field="text">${data.text || ""}</span>
+      ${linkMarkup}
       <button class="delete-button small" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="${key}">
         Delete
       </button>
@@ -395,6 +443,8 @@ const wirePostForm = () => {
       currentUser.email ||
       "Member";
     const authorEmail = currentUser.email || null;
+    const linkTitle = postLinkTitle?.value?.trim() || "";
+    const linkUrl = normalizeUrl(postLinkUrl?.value?.trim() || "");
 
     if (type === "shows" || type === "auditions") {
       const text = postListItem?.value?.trim() || "";
@@ -405,12 +455,20 @@ const wirePostForm = () => {
       try {
         await db.collection(type).add({
           text,
+          linkTitle,
+          linkUrl,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           authorName,
           authorEmail,
         });
         if (postListItem) {
           postListItem.value = "";
+        }
+        if (postLinkTitle) {
+          postLinkTitle.value = "";
+        }
+        if (postLinkUrl) {
+          postLinkUrl.value = "";
         }
         showToast("Posted.");
       } catch (error) {
@@ -431,6 +489,8 @@ const wirePostForm = () => {
       await db.collection(type).add({
         title,
         body,
+        linkTitle,
+        linkUrl,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName,
         authorEmail,
@@ -440,6 +500,12 @@ const wirePostForm = () => {
       }
       if (postBody) {
         postBody.value = "";
+      }
+      if (postLinkTitle) {
+        postLinkTitle.value = "";
+      }
+      if (postLinkUrl) {
+        postLinkUrl.value = "";
       }
       showToast("Posted.");
     } catch (error) {
@@ -468,9 +534,16 @@ const saveEdits = async () => {
         element.querySelector('[data-field="text"]')?.textContent ||
         element.textContent ||
         "";
+      const linkTitle =
+        element.querySelector('[data-field="linkTitle"]')?.textContent || "";
+      const linkUrlRaw =
+        element.querySelector('[data-field="linkUrl"]')?.textContent || "";
+      const linkUrl = normalizeUrl(linkUrlRaw.trim());
       updates.push(
         db.collection(type).doc(docId).update({
           text: textValue.trim(),
+          linkTitle: linkTitle.trim(),
+          linkUrl: linkUrl,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
           updatedBy: currentUser?.email || null,
         })
@@ -480,10 +553,17 @@ const saveEdits = async () => {
 
     const title = element.querySelector('[data-field="title"]')?.textContent || "";
     const body = element.querySelector('[data-field="body"]')?.textContent || "";
+    const linkTitle =
+      element.querySelector('[data-field="linkTitle"]')?.textContent || "";
+    const linkUrlRaw =
+      element.querySelector('[data-field="linkUrl"]')?.textContent || "";
+    const linkUrl = normalizeUrl(linkUrlRaw.trim());
     updates.push(
       db.collection(type).doc(docId).update({
         title,
         body,
+        linkTitle: linkTitle.trim(),
+        linkUrl: linkUrl,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedBy: currentUser?.email || null,
       })
@@ -510,9 +590,13 @@ const addItem = async (type) => {
     if (!text) {
       return;
     }
+    const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
+    const linkTitle = linkUrl ? prompt("Optional link title") || "" : "";
     try {
       await db.collection(type).add({
         text,
+        linkTitle,
+        linkUrl,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName: currentUser?.displayName || currentUser?.email || "Member",
         authorEmail: currentUser?.email || null,
@@ -533,11 +617,15 @@ const addItem = async (type) => {
   if (!body) {
     return;
   }
+  const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
+  const linkTitle = linkUrl ? prompt("Optional link title") || "" : "";
 
   try {
     await db.collection(type).add({
       title,
       body,
+      linkTitle,
+      linkUrl,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       authorName: currentUser?.displayName || currentUser?.email || "Member",
       authorEmail: currentUser?.email || null,
@@ -571,6 +659,8 @@ const seedDemoContent = async () => {
         body: '"Midsummer in May" opens next weekend. Tickets are live.',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName: "Alex",
+          linkTitle: "Tickets and info",
+          linkUrl: "https://example.com",
       }),
       db.collection("announcements").add({
         title: "Congrats, castmates",
@@ -583,19 +673,27 @@ const seedDemoContent = async () => {
         body: "I need a scene partner this Thursday evening. Anyone up for it?",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName: "Riley",
+          linkTitle: "RSVP",
+          linkUrl: "https://example.com",
       }),
       db.collection("events").add({
         title: "Jan 24 · Opening night meet-up",
         body: "Pre-show dinner near the theater. RSVP in the form below.",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          linkTitle: "Event info",
+          linkUrl: "https://example.com",
       }),
       db.collection("shows").add({
         text: '"The Enchanted Forest" — Feb 2-18',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          linkTitle: "Tickets",
+          linkUrl: "https://example.com",
       }),
       db.collection("auditions").add({
         text: "City Players — submissions due Jan 20",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          linkTitle: "Audition packet",
+          linkUrl: "https://example.com",
       }),
     ]);
 
