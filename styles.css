@@ -160,6 +160,14 @@ a {
   font-size: 14px;
 }
 
+.nav-highlight {
+  background: #2c1b0f;
+  color: #f8d66d;
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: 0 6px 12px rgba(44, 27, 15, 0.2);
+}
+
 .auth-status {
   display: flex;
   align-items: center;
