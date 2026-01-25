@@ -1,21 +1,25 @@
 const { URL } = require("url");
 
-const getMetaContent = (html, property) => {
-  const regex = new RegExp(
-    `<meta[^>]+property=["']${property}["'][^>]+content=["']([^"']+)["'][^>]*>`,
-    "i"
-  );
-  const match = html.match(regex);
-  return match ? match[1] : "";
+const parseMetaTags = (html) => {
+  const tags = [];
+  const metaTagRegex = /<meta\s+[^>]*>/gi;
+  const attrRegex = /([^\s=]+)=["']([^"']+)["']/g;
+  const matches = html.match(metaTagRegex) || [];
+  matches.forEach((tag) => {
+    const attrs = {};
+    let attrMatch;
+    while ((attrMatch = attrRegex.exec(tag))) {
+      attrs[attrMatch[1].toLowerCase()] = attrMatch[2];
+    }
+    tags.push(attrs);
+  });
+  return tags;
 };
 
-const getMetaNameContent = (html, name) => {
-  const regex = new RegExp(
-    `<meta[^>]+name=["']${name}["'][^>]+content=["']([^"']+)["'][^>]*>`,
-    "i"
-  );
-  const match = html.match(regex);
-  return match ? match[1] : "";
+const getMetaValue = (tags, key, value) => {
+  const lowerValue = value.toLowerCase();
+  const tag = tags.find((item) => item[key] && item[key].toLowerCase() === lowerValue);
+  return tag?.content || "";
 };
 
 const getTitle = (html) => {
@@ -79,6 +83,15 @@ exports.handler = async (event) => {
     });
 
     const contentType = response.headers.get("content-type") || "";
+    if (contentType.startsWith("image/")) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          title: "",
+          image: parsedUrl.toString(),
+        }),
+      };
+    }
     if (!contentType.includes("text/html")) {
       return {
         statusCode: 200,
@@ -87,17 +100,16 @@ exports.handler = async (event) => {
     }
 
     const html = await response.text();
+    const tags = parseMetaTags(html);
     const title =
-      getMetaContent(html, "og:title") ||
-      getMetaContent(html, "twitter:title") ||
-      getMetaNameContent(html, "twitter:title") ||
+      getMetaValue(tags, "property", "og:title") ||
+      getMetaValue(tags, "name", "twitter:title") ||
       getTitle(html);
     const image =
-      getMetaContent(html, "og:image:secure_url") ||
-      getMetaContent(html, "og:image") ||
-      getMetaContent(html, "twitter:image") ||
-      getMetaNameContent(html, "twitter:image") ||
-      getMetaNameContent(html, "twitter:image:src");
+      getMetaValue(tags, "property", "og:image:secure_url") ||
+      getMetaValue(tags, "property", "og:image") ||
+      getMetaValue(tags, "name", "twitter:image") ||
+      getMetaValue(tags, "name", "twitter:image:src");
     const resolvedImage = resolveUrl(parsedUrl.toString(), image.trim());
     const proxiedImage = buildProxyUrl(resolvedImage);
 
