@@ -543,9 +543,6 @@ main {
 .media-card {
   color: #fff;
   background: #2c1b0f;
-  background-size: 100% 100%;
-  background-position: center center;
-  background-repeat: no-repeat;
   min-height: 220px;
   position: relative;
 }

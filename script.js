@@ -266,9 +266,6 @@ const renderAnnouncements = (docs) => {
       ? buildProxyImageUrl(data.imageUrl)
       : "";
     card.className = `card${backgroundImage ? " media-card" : ""}`;
-    if (backgroundImage) {
-      card.style.backgroundImage = `url("${backgroundImage}")`;
-    }
     card.dataset.docId = doc.id;
     card.dataset.itemType = "announcements";
     const imageUrl = data.linkImage
@@ -328,9 +325,6 @@ const renderMessages = (docs) => {
       ? buildProxyImageUrl(data.imageUrl)
       : "";
     message.className = `message${backgroundImage ? " media-card" : ""}`;
-    if (backgroundImage) {
-      message.style.backgroundImage = `url("${backgroundImage}")`;
-    }
     message.dataset.docId = doc.id;
     message.dataset.itemType = "messages";
     const imageUrl = data.linkImage
@@ -387,9 +381,6 @@ const renderEvents = (docs) => {
       ? buildProxyImageUrl(data.imageUrl)
       : "";
     eventItem.className = `timeline-item${backgroundImage ? " media-card" : ""}`;
-    if (backgroundImage) {
-      eventItem.style.backgroundImage = `url("${backgroundImage}")`;
-    }
     eventItem.dataset.docId = doc.id;
     eventItem.dataset.itemType = "events";
     const dateBadge = data.eventDate
@@ -467,7 +458,6 @@ const renderList = (key, docs) => {
     li.dataset.itemType = key;
     if (backgroundImage) {
       li.className = "list-card media-card";
-      li.style.backgroundImage = `url("${backgroundImage}")`;
     } else {
       li.className = "list-card";
     }
