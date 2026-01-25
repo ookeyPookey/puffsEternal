@@ -9,9 +9,32 @@ const getMetaContent = (html, property) => {
   return match ? match[1] : "";
 };
 
+const getMetaNameContent = (html, name) => {
+  const regex = new RegExp(
+    `<meta[^>]+name=["']${name}["'][^>]+content=["']([^"']+)["'][^>]*>`,
+    "i"
+  );
+  const match = html.match(regex);
+  return match ? match[1] : "";
+};
+
 const getTitle = (html) => {
   const match = html.match(/<title>([^<]+)<\/title>/i);
   return match ? match[1] : "";
+};
+
+const resolveUrl = (baseUrl, candidate) => {
+  if (!candidate) {
+    return "";
+  }
+  if (candidate.startsWith("data:")) {
+    return candidate;
+  }
+  try {
+    return new URL(candidate, baseUrl).toString();
+  } catch (error) {
+    return candidate;
+  }
 };
 
 exports.handler = async (event) => {
@@ -60,14 +83,19 @@ exports.handler = async (event) => {
     const title =
       getMetaContent(html, "og:title") ||
       getMetaContent(html, "twitter:title") ||
+      getMetaNameContent(html, "twitter:title") ||
       getTitle(html);
     const image =
+      getMetaContent(html, "og:image:secure_url") ||
       getMetaContent(html, "og:image") ||
-      getMetaContent(html, "twitter:image");
+      getMetaContent(html, "twitter:image") ||
+      getMetaNameContent(html, "twitter:image") ||
+      getMetaNameContent(html, "twitter:image:src");
+    const resolvedImage = resolveUrl(parsedUrl.toString(), image.trim());
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ title: title.trim(), image: image.trim() }),
+      body: JSON.stringify({ title: title.trim(), image: resolvedImage }),
     };
   } catch (error) {
     return {
