@@ -15,6 +15,7 @@ const signOutBtn = document.getElementById("signOutBtn");
 const userBadge = document.getElementById("userBadge");
 const authSections = document.querySelectorAll("[data-auth]");
 const emptyStates = document.querySelectorAll("[data-empty]");
+const toggleUserEditMode = document.getElementById("toggleUserEditMode");
 const postForm = document.getElementById("postForm");
 const postType = document.getElementById("postType");
 const postTitleField = document.getElementById("postTitleField");
@@ -45,6 +46,7 @@ let db = null;
 let auth = null;
 let currentUser = null;
 let isEditor = false;
+let isSignedIn = false;
 let listeners = [];
 let editorInviteUnsubscribe = null;
 let deleteHandlerWired = false;
@@ -335,6 +337,7 @@ const renderAnnouncements = (docs) => {
     card.className = `card${backgroundImage ? " media-card" : ""}`;
     card.dataset.docId = doc.id;
     card.dataset.itemType = "announcements";
+    card.dataset.authorEmail = data.authorEmail || "";
 
     if (backgroundImage) {
       const mediaImage = document.createElement("img");
@@ -371,6 +374,7 @@ const renderAnnouncements = (docs) => {
     deleteButton.dataset.action = "delete";
     deleteButton.dataset.docId = doc.id;
     deleteButton.dataset.itemType = "announcements";
+    deleteButton.dataset.authorEmail = data.authorEmail || "";
     deleteButton.textContent = "Delete";
     content.appendChild(deleteButton);
 
@@ -408,6 +412,7 @@ const renderMessages = (docs) => {
     message.className = `message${backgroundImage ? " media-card" : ""}`;
     message.dataset.docId = doc.id;
     message.dataset.itemType = "messages";
+    message.dataset.authorEmail = data.authorEmail || "";
 
     if (backgroundImage) {
       const mediaImage = document.createElement("img");
@@ -444,6 +449,7 @@ const renderMessages = (docs) => {
     deleteButton.dataset.action = "delete";
     deleteButton.dataset.docId = doc.id;
     deleteButton.dataset.itemType = "messages";
+    deleteButton.dataset.authorEmail = data.authorEmail || "";
     deleteButton.textContent = "Delete";
     content.appendChild(deleteButton);
 
@@ -478,6 +484,7 @@ const renderEvents = (docs) => {
     eventItem.className = `timeline-item${backgroundImage ? " media-card" : ""}`;
     eventItem.dataset.docId = doc.id;
     eventItem.dataset.itemType = "events";
+    eventItem.dataset.authorEmail = data.authorEmail || "";
 
     if (backgroundImage) {
       const mediaImage = document.createElement("img");
@@ -520,6 +527,7 @@ const renderEvents = (docs) => {
     deleteButton.dataset.action = "delete";
     deleteButton.dataset.docId = doc.id;
     deleteButton.dataset.itemType = "events";
+    deleteButton.dataset.authorEmail = data.authorEmail || "";
     deleteButton.textContent = "Delete";
     content.appendChild(deleteButton);
 
@@ -553,6 +561,7 @@ const renderList = (key, docs) => {
     const li = document.createElement("li");
     li.dataset.docId = doc.id;
     li.dataset.itemType = key;
+    li.dataset.authorEmail = data.authorEmail || "";
     if (backgroundImage) {
       li.className = "list-card media-card";
     } else {
@@ -590,6 +599,7 @@ const renderList = (key, docs) => {
     deleteButton.dataset.action = "delete";
     deleteButton.dataset.docId = doc.id;
     deleteButton.dataset.itemType = key;
+    deleteButton.dataset.authorEmail = data.authorEmail || "";
     deleteButton.textContent = "Delete";
     content.appendChild(deleteButton);
     li.appendChild(content);
@@ -643,7 +653,7 @@ const stopListeners = () => {
 };
 
 const toggleEditMode = (enabled) => {
-  if (!isEditor) {
+  if (!isSignedIn) {
     return;
   }
   applyEditableState(enabled);
@@ -652,6 +662,14 @@ const toggleEditMode = (enabled) => {
   } else {
     startListeners();
   }
+};
+
+const canEditElement = (element) => {
+  if (isEditor) {
+    return true;
+  }
+  const authorEmail = element?.dataset?.authorEmail || "";
+  return !!currentUser?.email && authorEmail === currentUser.email;
 };
 
 const wireDeleteActions = () => {
@@ -664,8 +682,11 @@ const wireDeleteActions = () => {
     if (!button) {
       return;
     }
-    if (!isEditor || !db) {
-      showToast("Only editors can delete.");
+    if (!db) {
+      return;
+    }
+    if (!isEditor && button.dataset.authorEmail !== currentUser?.email) {
+      showToast("You can only delete your own posts.");
       return;
     }
     const docId = button.dataset.docId;
@@ -812,7 +833,7 @@ const wirePostForm = () => {
 };
 
 const saveEdits = async () => {
-  if (!db || !isEditor) {
+  if (!db || !isSignedIn) {
     return;
   }
 
@@ -826,6 +847,9 @@ const saveEdits = async () => {
     if (!docId || !type) {
       return;
     }
+      if (!canEditElement(element)) {
+        return;
+      }
 
     if (type === "shows" || type === "auditions") {
       const textValue =
@@ -1169,6 +1193,7 @@ const initAuth = () => {
   auth.onAuthStateChanged((user) => {
     currentUser = user;
     if (user) {
+      isSignedIn = true;
       const label = user.displayName || user.email || "Signed in";
       if (userBadge) {
         userBadge.textContent = label;
@@ -1178,6 +1203,7 @@ const initAuth = () => {
       startListeners();
     } else {
       isEditor = false;
+      isSignedIn = false;
       if (userBadge) {
         userBadge.textContent = "Signed out";
       }
@@ -1202,4 +1228,10 @@ toastTargets.forEach((button) => {
 wireEditorTools();
 wireDeleteActions();
 wirePostForm();
+
+  toggleUserEditMode?.addEventListener("click", () => {
+    const enabled = !document.body.classList.contains("edit-mode");
+    toggleEditMode(enabled);
+    toggleUserEditMode.textContent = enabled ? "Stop editing" : "Edit my posts";
+  });
 initAuth();

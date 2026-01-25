@@ -23,32 +23,42 @@ service cloud.firestore {
 
     match /announcements/{docId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isEditor();
+      allow create: if isSignedIn()
+        && request.resource.data.authorEmail == request.auth.token.email;
+      allow update, delete: if isEditor()
+        || request.auth.token.email == resource.data.authorEmail;
     }
 
     match /messages/{docId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isEditor();
+      allow create: if isSignedIn()
+        && request.resource.data.authorEmail == request.auth.token.email;
+      allow update, delete: if isEditor()
+        || request.auth.token.email == resource.data.authorEmail;
     }
 
     match /events/{docId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isEditor();
+      allow create: if isSignedIn()
+        && request.resource.data.authorEmail == request.auth.token.email;
+      allow update, delete: if isEditor()
+        || request.auth.token.email == resource.data.authorEmail;
     }
 
     match /shows/{docId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isEditor();
+      allow create: if isSignedIn()
+        && request.resource.data.authorEmail == request.auth.token.email;
+      allow update, delete: if isEditor()
+        || request.auth.token.email == resource.data.authorEmail;
     }
 
     match /auditions/{docId} {
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isEditor();
+      allow create: if isSignedIn()
+        && request.resource.data.authorEmail == request.auth.token.email;
+      allow update, delete: if isEditor()
+        || request.auth.token.email == resource.data.authorEmail;
     }
 
     match /{document=**} {
