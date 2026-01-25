@@ -12,7 +12,12 @@ const authButtons = {
   ].filter(Boolean),
 };
 const signOutBtn = document.getElementById("signOutBtn");
-const userBadge = document.getElementById("userBadge");
+const userName = document.getElementById("userName");
+const userAvatar = document.getElementById("userAvatar");
+const userMenuToggle = document.getElementById("userMenuToggle");
+const userMenu = document.getElementById("userMenu");
+const userSettingsBtn = document.getElementById("userSettingsBtn");
+const userMenuWrapper = document.querySelector(".user-menu");
 const authSections = document.querySelectorAll("[data-auth]");
 const emptyStates = document.querySelectorAll("[data-empty]");
 const toggleUserEditMode = document.getElementById("toggleUserEditMode");
@@ -65,6 +70,40 @@ const showToast = (message) => {
     toast.classList.remove("toast-visible");
     setTimeout(() => toast.remove(), 300);
   }, 2500);
+};
+
+const setUserMenuOpen = (open) => {
+  if (!userMenuWrapper) {
+    return;
+  }
+  userMenuWrapper.classList.toggle("open", open);
+};
+
+const wireUserMenu = () => {
+  if (!userMenuToggle) {
+    return;
+  }
+  userMenuToggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setUserMenuOpen(!userMenuWrapper?.classList.contains("open"));
+  });
+
+  userSettingsBtn?.addEventListener("click", () => {
+    showToast("Settings coming soon.");
+    setUserMenuOpen(false);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (userMenuWrapper && !userMenuWrapper.contains(event.target)) {
+      setUserMenuOpen(false);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setUserMenuOpen(false);
+    }
+  });
 };
 
 let authUnavailableWired = false;
@@ -1195,8 +1234,19 @@ const initAuth = () => {
     if (user) {
       isSignedIn = true;
       const label = user.displayName || user.email || "Signed in";
-      if (userBadge) {
-        userBadge.textContent = label;
+      if (userName) {
+        userName.textContent = label;
+      }
+      if (userAvatar) {
+        if (user.photoURL) {
+          userAvatar.src = user.photoURL;
+          userAvatar.alt = `${label} avatar`;
+          userAvatar.style.display = "block";
+        } else {
+          userAvatar.removeAttribute("src");
+          userAvatar.alt = "";
+          userAvatar.style.display = "none";
+        }
       }
       subscribeEditorStatus(user.email);
       setAuthVisibility(true);
@@ -1204,9 +1254,15 @@ const initAuth = () => {
     } else {
       isEditor = false;
       isSignedIn = false;
-      if (userBadge) {
-        userBadge.textContent = "Signed out";
+      if (userName) {
+        userName.textContent = "Signed out";
       }
+      if (userAvatar) {
+        userAvatar.removeAttribute("src");
+        userAvatar.alt = "";
+        userAvatar.style.display = "none";
+      }
+      setUserMenuOpen(false);
       if (editorInviteUnsubscribe) {
         editorInviteUnsubscribe();
         editorInviteUnsubscribe = null;
@@ -1228,6 +1284,7 @@ toastTargets.forEach((button) => {
 wireEditorTools();
 wireDeleteActions();
 wirePostForm();
+wireUserMenu();
 
   toggleUserEditMode?.addEventListener("click", () => {
     const enabled = !document.body.classList.contains("edit-mode");

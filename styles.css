@@ -166,6 +166,75 @@ a {
   gap: 10px;
 }
 
+.user-menu {
+  position: relative;
+}
+
+.user-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #2c1b0f;
+  color: #f8d66d;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #f8d66d;
+  object-fit: cover;
+  background: #f8d66d;
+}
+
+.user-name {
+  font-size: 14px;
+}
+
+.user-chevron {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.user-menu-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: #fff7da;
+  border: 1px solid #e6c45c;
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 12px 24px rgba(44, 27, 15, 0.2);
+  display: none;
+  min-width: 180px;
+  z-index: 20;
+}
+
+.user-menu.open .user-menu-dropdown {
+  display: grid;
+  gap: 6px;
+}
+
+.user-menu-item {
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  color: #2c1b0f;
+  cursor: pointer;
+}
+
+.user-menu-item:hover {
+  background: #fff2bf;
+}
+
 .cta {
   margin-left: 16px;
   padding: 10px 16px;
