@@ -547,6 +547,17 @@ main {
   background-position: center center;
   background-repeat: no-repeat;
   min-height: 220px;
+  position: relative;
+}
+
+.media-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  z-index: 0;
 }
 
 .media-card::before {
@@ -554,12 +565,12 @@ main {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(10, 8, 6, 0.2) 0%, rgba(10, 8, 6, 0.8) 70%);
-  z-index: 0;
+  z-index: 1;
 }
 
 .media-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   gap: 10px;
   height: 100%;
@@ -587,7 +598,7 @@ main {
   border-radius: 50%;
   border: 2px solid #f8d66d;
   object-fit: cover;
-  z-index: 2;
+  z-index: 3;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
@@ -601,7 +612,7 @@ main {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
-  z-index: 2;
+  z-index: 3;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }

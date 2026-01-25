@@ -283,7 +283,11 @@ const renderAnnouncements = (docs) => {
         </a>
       `
       : "";
+    const mediaImageMarkup = backgroundImage
+      ? `<img class="media-image" src="${backgroundImage}" alt="" loading="lazy" />`
+      : "";
     card.innerHTML = `
+      ${mediaImageMarkup}
       <div class="media-content">
         <h3 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h3>
         <p class="media-body" data-editable="true" data-field="body">${data.body || ""}</p>
@@ -341,7 +345,11 @@ const renderMessages = (docs) => {
         </a>
       `
       : "";
+    const mediaImageMarkup = backgroundImage
+      ? `<img class="media-image" src="${backgroundImage}" alt="" loading="lazy" />`
+      : "";
     message.innerHTML = `
+      ${mediaImageMarkup}
       <div class="media-content">
         <h4 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h4>
         <p class="media-body" data-editable="true" data-field="body">${data.body || ""}</p>
@@ -399,7 +407,11 @@ const renderEvents = (docs) => {
         </a>
       `
       : "";
+    const mediaImageMarkup = backgroundImage
+      ? `<img class="media-image" src="${backgroundImage}" alt="" loading="lazy" />`
+      : "";
     eventItem.innerHTML = `
+      ${mediaImageMarkup}
       ${dateBadge}
       <div class="media-content">
         <h4 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h4>
@@ -459,7 +471,11 @@ const renderList = (key, docs) => {
     } else {
       li.className = "list-card";
     }
+    const mediaImageMarkup = backgroundImage
+      ? `<img class="media-image" src="${backgroundImage}" alt="" loading="lazy" />`
+      : "";
     li.innerHTML = `
+      ${mediaImageMarkup}
       ${dateBadge}
       <div class="media-content">
         <span class="media-title" data-editable="true" data-field="text">${data.text || ""}</span>
