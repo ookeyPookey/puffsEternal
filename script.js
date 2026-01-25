@@ -179,6 +179,73 @@ const normalizeUrl = (url) => {
   return `https://${url}`;
 };
 
+const safeHref = (url) => {
+  if (!url) {
+    return "";
+  }
+  if (/^(javascript|data):/i.test(url.trim())) {
+    return "";
+  }
+  const normalized = normalizeUrl(url.trim());
+  try {
+    const parsed = new URL(normalized);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString();
+    }
+  } catch (error) {
+    return "";
+  }
+  return "";
+};
+
+const createTextEl = (tag, className, text, attrs = {}) => {
+  const el = document.createElement(tag);
+  if (className) {
+    el.className = className;
+  }
+  el.textContent = text || "";
+  Object.entries(attrs).forEach(([key, value]) => {
+    el.setAttribute(key, value);
+  });
+  return el;
+};
+
+const buildLinkCard = (data, isSmall = false) => {
+  const href = safeHref(data.linkUrl || "");
+  if (!href) {
+    return null;
+  }
+  const card = document.createElement("a");
+  card.className = `link-card${isSmall ? " small" : ""}`;
+  card.href = href;
+  card.target = "_blank";
+  card.rel = "noreferrer";
+
+  if (data.linkImage) {
+    const thumb = document.createElement("img");
+    thumb.className = "link-thumb";
+    thumb.src = buildProxyImageUrl(data.linkImage);
+    thumb.alt = "";
+    thumb.loading = "lazy";
+    card.appendChild(thumb);
+  }
+
+  const titleText = data.linkTitle || href;
+  card.appendChild(
+    createTextEl("span", "link-title", titleText, {
+      "data-editable": "true",
+      "data-field": "linkTitle",
+    })
+  );
+  card.appendChild(
+    createTextEl("span", "link-url", href, {
+      "data-editable": "true",
+      "data-field": "linkUrl",
+    })
+  );
+  return card;
+};
+
 const fetchLinkPreview = async (url) => {
   if (!url) {
     return { title: "", image: "" };
@@ -258,7 +325,7 @@ const renderAnnouncements = (docs) => {
   container.innerHTML = "";
   docs.forEach((doc) => {
     const data = doc.data();
-    const meta = data.authorName
+    const metaText = data.authorName
       ? `Posted by ${data.authorName} · ${formatDate(data.createdAt)}`
       : formatDate(data.createdAt);
     const card = document.createElement("article");
@@ -268,33 +335,47 @@ const renderAnnouncements = (docs) => {
     card.className = `card${backgroundImage ? " media-card" : ""}`;
     card.dataset.docId = doc.id;
     card.dataset.itemType = "announcements";
-    const imageUrl = data.linkImage
-      ? buildProxyImageUrl(data.linkImage)
-      : "";
-    const linkMarkup = data.linkUrl
-      ? `
-        <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
-          ${imageUrl ? `<img class="link-thumb" src="${imageUrl}" alt="" loading="lazy" />` : ""}
-          <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
-          <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
-        </a>
-      `
-      : "";
-    const mediaImageMarkup = backgroundImage
-      ? `<img class="media-image" src="${backgroundImage}" alt="" loading="lazy" />`
-      : "";
-    card.innerHTML = `
-      ${mediaImageMarkup}
-      <div class="media-content">
-        <h3 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h3>
-        <p class="media-body" data-editable="true" data-field="body">${data.body || ""}</p>
-        ${linkMarkup}
-        <div class="meta">${meta}</div>
-        <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="announcements">
-          Delete
-        </button>
-      </div>
-    `;
+
+    if (backgroundImage) {
+      const mediaImage = document.createElement("img");
+      mediaImage.className = "media-image";
+      mediaImage.src = backgroundImage;
+      mediaImage.alt = "";
+      mediaImage.loading = "lazy";
+      card.appendChild(mediaImage);
+    }
+
+    const content = document.createElement("div");
+    content.className = "media-content";
+    content.appendChild(
+      createTextEl("h3", "media-title", data.title, {
+        "data-editable": "true",
+        "data-field": "title",
+      })
+    );
+    content.appendChild(
+      createTextEl("p", "media-body", data.body, {
+        "data-editable": "true",
+        "data-field": "body",
+      })
+    );
+    const linkCard = buildLinkCard(data);
+    if (linkCard) {
+      content.appendChild(linkCard);
+    }
+    content.appendChild(createTextEl("div", "meta", metaText));
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete-button";
+    deleteButton.type = "button";
+    deleteButton.dataset.action = "delete";
+    deleteButton.dataset.docId = doc.id;
+    deleteButton.dataset.itemType = "announcements";
+    deleteButton.textContent = "Delete";
+    content.appendChild(deleteButton);
+
+    card.appendChild(content);
+
     if (data.authorPhoto) {
       const avatar = document.createElement("img");
       avatar.className = "avatar";
@@ -317,7 +398,7 @@ const renderMessages = (docs) => {
   container.innerHTML = "";
   docs.forEach((doc) => {
     const data = doc.data();
-    const meta = data.authorName
+    const metaText = data.authorName
       ? `${data.authorName} · ${formatDate(data.createdAt)}`
       : formatDate(data.createdAt);
     const message = document.createElement("div");
@@ -327,33 +408,47 @@ const renderMessages = (docs) => {
     message.className = `message${backgroundImage ? " media-card" : ""}`;
     message.dataset.docId = doc.id;
     message.dataset.itemType = "messages";
-    const imageUrl = data.linkImage
-      ? buildProxyImageUrl(data.linkImage)
-      : "";
-    const linkMarkup = data.linkUrl
-      ? `
-        <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
-          ${imageUrl ? `<img class="link-thumb" src="${imageUrl}" alt="" loading="lazy" />` : ""}
-          <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
-          <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
-        </a>
-      `
-      : "";
-    const mediaImageMarkup = backgroundImage
-      ? `<img class="media-image" src="${backgroundImage}" alt="" loading="lazy" />`
-      : "";
-    message.innerHTML = `
-      ${mediaImageMarkup}
-      <div class="media-content">
-        <h4 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h4>
-        <p class="media-body" data-editable="true" data-field="body">${data.body || ""}</p>
-        ${linkMarkup}
-        <span class="meta">${meta}</span>
-        <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="messages">
-          Delete
-        </button>
-      </div>
-    `;
+
+    if (backgroundImage) {
+      const mediaImage = document.createElement("img");
+      mediaImage.className = "media-image";
+      mediaImage.src = backgroundImage;
+      mediaImage.alt = "";
+      mediaImage.loading = "lazy";
+      message.appendChild(mediaImage);
+    }
+
+    const content = document.createElement("div");
+    content.className = "media-content";
+    content.appendChild(
+      createTextEl("h4", "media-title", data.title, {
+        "data-editable": "true",
+        "data-field": "title",
+      })
+    );
+    content.appendChild(
+      createTextEl("p", "media-body", data.body, {
+        "data-editable": "true",
+        "data-field": "body",
+      })
+    );
+    const linkCard = buildLinkCard(data);
+    if (linkCard) {
+      content.appendChild(linkCard);
+    }
+    content.appendChild(createTextEl("span", "meta", metaText));
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete-button";
+    deleteButton.type = "button";
+    deleteButton.dataset.action = "delete";
+    deleteButton.dataset.docId = doc.id;
+    deleteButton.dataset.itemType = "messages";
+    deleteButton.textContent = "Delete";
+    content.appendChild(deleteButton);
+
+    message.appendChild(content);
+
     if (data.authorPhoto) {
       const avatar = document.createElement("img");
       avatar.className = "avatar";
@@ -383,36 +478,53 @@ const renderEvents = (docs) => {
     eventItem.className = `timeline-item${backgroundImage ? " media-card" : ""}`;
     eventItem.dataset.docId = doc.id;
     eventItem.dataset.itemType = "events";
-    const dateBadge = data.eventDate
-      ? `<span class="date-badge">${formatEventDate(data.eventDate)}</span>`
-      : "";
-    const imageUrl = data.linkImage
-      ? buildProxyImageUrl(data.linkImage)
-      : "";
-    const linkMarkup = data.linkUrl
-      ? `
-        <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
-          ${imageUrl ? `<img class="link-thumb" src="${imageUrl}" alt="" loading="lazy" />` : ""}
-          <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
-          <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
-        </a>
-      `
-      : "";
-    const mediaImageMarkup = backgroundImage
-      ? `<img class="media-image" src="${backgroundImage}" alt="" loading="lazy" />`
-      : "";
-    eventItem.innerHTML = `
-      ${mediaImageMarkup}
-      ${dateBadge}
-      <div class="media-content">
-        <h4 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h4>
-        <p class="media-body" data-editable="true" data-field="body">${data.body || ""}</p>
-        ${linkMarkup}
-        <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="events">
-          Delete
-        </button>
-      </div>
-    `;
+
+    if (backgroundImage) {
+      const mediaImage = document.createElement("img");
+      mediaImage.className = "media-image";
+      mediaImage.src = backgroundImage;
+      mediaImage.alt = "";
+      mediaImage.loading = "lazy";
+      eventItem.appendChild(mediaImage);
+    }
+
+    if (data.eventDate) {
+      const badge = document.createElement("span");
+      badge.className = "date-badge";
+      badge.textContent = formatEventDate(data.eventDate);
+      eventItem.appendChild(badge);
+    }
+
+    const content = document.createElement("div");
+    content.className = "media-content";
+    content.appendChild(
+      createTextEl("h4", "media-title", data.title, {
+        "data-editable": "true",
+        "data-field": "title",
+      })
+    );
+    content.appendChild(
+      createTextEl("p", "media-body", data.body, {
+        "data-editable": "true",
+        "data-field": "body",
+      })
+    );
+    const linkCard = buildLinkCard(data);
+    if (linkCard) {
+      content.appendChild(linkCard);
+    }
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete-button";
+    deleteButton.type = "button";
+    deleteButton.dataset.action = "delete";
+    deleteButton.dataset.docId = doc.id;
+    deleteButton.dataset.itemType = "events";
+    deleteButton.textContent = "Delete";
+    content.appendChild(deleteButton);
+
+    eventItem.appendChild(content);
+
     if (data.authorPhoto) {
       const avatar = document.createElement("img");
       avatar.className = "avatar";
@@ -438,21 +550,6 @@ const renderList = (key, docs) => {
     const backgroundImage = data.imageUrl
       ? buildProxyImageUrl(data.imageUrl)
       : "";
-    const dateBadge = data.eventDate
-      ? `<span class="date-badge">${formatEventDate(data.eventDate)}</span>`
-      : "";
-    const imageUrl = data.linkImage
-      ? buildProxyImageUrl(data.linkImage)
-      : "";
-    const linkMarkup = data.linkUrl
-      ? `
-        <a class="link-card small" href="${data.linkUrl}" target="_blank" rel="noreferrer">
-          ${imageUrl ? `<img class="link-thumb" src="${imageUrl}" alt="" loading="lazy" />` : ""}
-          <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
-          <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
-        </a>
-      `
-      : "";
     const li = document.createElement("li");
     li.dataset.docId = doc.id;
     li.dataset.itemType = key;
@@ -461,20 +558,41 @@ const renderList = (key, docs) => {
     } else {
       li.className = "list-card";
     }
-    const mediaImageMarkup = backgroundImage
-      ? `<img class="media-image" src="${backgroundImage}" alt="" loading="lazy" />`
-      : "";
-    li.innerHTML = `
-      ${mediaImageMarkup}
-      ${dateBadge}
-      <div class="media-content">
-        <span class="media-title" data-editable="true" data-field="text">${data.text || ""}</span>
-        ${linkMarkup}
-        <button class="delete-button small" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="${key}">
-          Delete
-        </button>
-      </div>
-    `;
+    if (backgroundImage) {
+      const mediaImage = document.createElement("img");
+      mediaImage.className = "media-image";
+      mediaImage.src = backgroundImage;
+      mediaImage.alt = "";
+      mediaImage.loading = "lazy";
+      li.appendChild(mediaImage);
+    }
+    if (data.eventDate) {
+      const badge = document.createElement("span");
+      badge.className = "date-badge";
+      badge.textContent = formatEventDate(data.eventDate);
+      li.appendChild(badge);
+    }
+    const content = document.createElement("div");
+    content.className = "media-content";
+    content.appendChild(
+      createTextEl("span", "media-title", data.text, {
+        "data-editable": "true",
+        "data-field": "text",
+      })
+    );
+    const linkCard = buildLinkCard(data, true);
+    if (linkCard) {
+      content.appendChild(linkCard);
+    }
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "delete-button small";
+    deleteButton.type = "button";
+    deleteButton.dataset.action = "delete";
+    deleteButton.dataset.docId = doc.id;
+    deleteButton.dataset.itemType = key;
+    deleteButton.textContent = "Delete";
+    content.appendChild(deleteButton);
+    li.appendChild(content);
     if (data.authorPhoto) {
       const avatar = document.createElement("img");
       avatar.className = "avatar";
