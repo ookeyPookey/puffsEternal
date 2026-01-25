@@ -32,7 +32,6 @@ const postListItem = document.getElementById("postListItem");
 const postDateField = document.getElementById("postDateField");
 const postDate = document.getElementById("postDate");
 const postImageUrl = document.getElementById("postImageUrl");
-const postLinkTitle = document.getElementById("postLinkTitle");
 const postLinkUrl = document.getElementById("postLinkUrl");
 const postName = postForm?.querySelector('input[name="name"]');
 
@@ -769,7 +768,6 @@ const wirePostForm = () => {
       "Member";
     const authorEmail = currentUser.email || null;
     const authorPhoto = currentUser.photoURL || "";
-    const linkTitle = postLinkTitle?.value?.trim() || "";
     const linkUrl = normalizeUrl(postLinkUrl?.value?.trim() || "");
     const imageUrl = normalizeUrl(postImageUrl?.value?.trim() || "");
     const eventDate = postDate?.value?.trim() || "";
@@ -779,7 +777,7 @@ const wirePostForm = () => {
       return;
     }
     const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
-    const resolvedLinkTitle = linkTitle || preview.title || "";
+    const resolvedLinkTitle = preview.title || "";
     const resolvedLinkImage = preview.image || "";
 
     if (type === "shows" || type === "auditions") {
@@ -809,9 +807,6 @@ const wirePostForm = () => {
         }
         if (postImageUrl) {
           postImageUrl.value = "";
-        }
-        if (postLinkTitle) {
-          postLinkTitle.value = "";
         }
         if (postLinkUrl) {
           postLinkUrl.value = "";
@@ -856,9 +851,6 @@ const wirePostForm = () => {
       }
       if (postImageUrl) {
         postImageUrl.value = "";
-      }
-      if (postLinkTitle) {
-        postLinkTitle.value = "";
       }
       if (postLinkUrl) {
         postLinkUrl.value = "";
@@ -960,10 +952,9 @@ const addItem = async (type) => {
         return;
       }
     const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
-    const linkTitle = linkUrl ? prompt("Optional link title") || "" : "";
       const imageUrl = normalizeUrl(prompt("Optional image URL") || "");
       const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
-      const resolvedLinkTitle = linkTitle || preview.title || "";
+      const resolvedLinkTitle = preview.title || "";
       const resolvedLinkImage = preview.image || "";
     try {
       await db.collection(type).add({
@@ -1000,10 +991,9 @@ const addItem = async (type) => {
     return;
   }
   const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
-  const linkTitle = linkUrl ? prompt("Optional link title") || "" : "";
   const imageUrl = normalizeUrl(prompt("Optional image URL") || "");
   const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
-  const resolvedLinkTitle = linkTitle || preview.title || "";
+  const resolvedLinkTitle = preview.title || "";
   const resolvedLinkImage = preview.image || "";
 
   try {

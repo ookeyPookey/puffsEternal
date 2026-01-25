@@ -167,6 +167,16 @@ a {
   letter-spacing: 0.4px;
   color: #2c1b0f;
   font-family: "Cinzel Decorative", "Cinzel", serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  display: block;
 }
 
 .nav-links {
@@ -174,6 +184,7 @@ a {
   gap: 18px;
   margin-left: auto;
   font-size: 14px;
+  align-items: center;
 }
 
 .nav-highlight {
@@ -623,6 +634,28 @@ main {
 .list {
   padding-left: 18px;
   color: #4a3f37;
+}
+
+.calendar-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.calendar-filters label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+  color: #5b4023;
+}
+
+.calendar-filters select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #e0c36c;
+  background: #fff7da;
+  font-family: inherit;
 }
 
 .timeline {

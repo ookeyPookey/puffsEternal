@@ -9,6 +9,8 @@
       content="A lightweight hub for Puffs friends and castmates to share announcements, messages, plays, auditions, and events."
     />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/png" href="assets/puffs-logo.png" />
+    <link rel="apple-touch-icon" href="assets/puffs-logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -25,7 +27,9 @@
         </div>
       </div>
       <nav class="nav">
-        <div class="logo">Puffs Eternal</div>
+        <a class="logo" href="index.html" aria-label="Puffs Eternal">
+          <img src="assets/puffs-logo.png" alt="Puffs Eternal logo" />
+        </a>
         <div class="nav-links">
           <a href="#announcements">Announcements</a>
           <a href="#messages">Messages</a>
@@ -329,15 +333,6 @@
               name="imageUrl"
               id="postImageUrl"
               placeholder="https://example.com/photo.jpg"
-            />
-          </label>
-          <label>
-            Link title (optional)
-            <input
-              type="text"
-              name="linkTitle"
-              id="postLinkTitle"
-              placeholder="Tickets and details"
             />
           </label>
           <label>

@@ -9,6 +9,8 @@
       content="Calendar of Puffs Eternal events, shows, and auditions."
     />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/png" href="assets/puffs-logo.png" />
+    <link rel="apple-touch-icon" href="assets/puffs-logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -25,7 +27,9 @@
         </div>
       </div>
       <nav class="nav">
-        <div class="logo">Puffs Eternal</div>
+        <a class="logo" href="index.html" aria-label="Puffs Eternal">
+          <img src="assets/puffs-logo.png" alt="Puffs Eternal logo" />
+        </a>
         <div class="nav-links">
           <a href="index.html#announcements">Announcements</a>
           <a href="index.html#messages">Messages</a>
@@ -44,24 +48,39 @@
           <h2>Calendar</h2>
           <p>All events, plays, and auditions in one place.</p>
         </div>
-
-        <div class="card-grid">
-          <article class="card">
-            <h3>Jan 24, 2026 · Opening night meet-up</h3>
-            <p>Pre-show dinner near the theater. RSVP in the update form.</p>
-            <div class="meta">Event</div>
-          </article>
-          <article class="card">
-            <h3>Feb 2, 2026 · The Enchanted Forest</h3>
-            <p>Shows run Feb 2-18. Tickets live.</p>
-            <div class="meta">Show</div>
-          </article>
-          <article class="card">
-            <h3>Jan 20, 2026 · City Players auditions</h3>
-            <p>Submissions due by end of day.</p>
-            <div class="meta">Audition</div>
-          </article>
+        <div class="calendar-filters" data-auth="signed-in">
+          <label>
+            Month
+            <select id="calendarMonthFilter">
+              <option value="all">All</option>
+            </select>
+          </label>
+          <label>
+            Type
+            <select id="calendarTypeFilter">
+              <option value="all">All</option>
+              <option value="Event">Events</option>
+              <option value="Show">Shows</option>
+              <option value="Audition">Auditions</option>
+            </select>
+          </label>
         </div>
+
+        <div class="card-grid" id="calendarGrid" data-auth="signed-in"></div>
+        <p class="empty-state" id="calendarEmpty" data-auth="signed-in">
+          No upcoming dates yet.
+        </p>
+        <div class="auth-buttons" data-auth="signed-out">
+          <button class="button primary" type="button" id="googleSignInCalendar">
+            Continue with Google
+          </button>
+          <button class="button ghost" type="button" id="facebookSignInCalendar">
+            Continue with Facebook
+          </button>
+        </div>
+        <p class="empty-state" data-auth="signed-out">
+          Sign in to see the shared calendar.
+        </p>
       </section>
 
       <section class="section alt">
@@ -69,29 +88,21 @@
           <h2>Month at a glance</h2>
           <p>Quick view of upcoming dates.</p>
         </div>
-        <div class="split">
-          <div class="card">
-            <h3>January</h3>
-            <ul class="list">
-              <li>Jan 20 · City Players auditions</li>
-              <li>Jan 24 · Opening night meet-up</li>
-              <li>Jan 25 · Puffs watch party</li>
-            </ul>
-          </div>
-          <div class="card">
-            <h3>February</h3>
-            <ul class="list">
-              <li>Feb 2 · The Enchanted Forest opens</li>
-              <li>Feb 6 · Puffs watch party</li>
-              <li>Feb 12 · Tiny Tim the Musical</li>
-            </ul>
-          </div>
-        </div>
+        <div class="split" id="calendarMonths" data-auth="signed-in"></div>
+        <p class="empty-state" data-auth="signed-out">
+          Sign in to see upcoming months.
+        </p>
       </section>
     </main>
 
     <footer class="site-footer">
       <p>Puffs Eternal · Third or Nothing!</p>
     </footer>
+
+    <script src="config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="calendar.js"></script>
   </body>
 </html>
