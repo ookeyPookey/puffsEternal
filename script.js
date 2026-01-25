@@ -161,6 +161,23 @@ const normalizeUrl = (url) => {
   return `https://${url}`;
 };
 
+const fetchLinkPreview = async (url) => {
+  if (!url) {
+    return { title: "", image: "" };
+  }
+  try {
+    const response = await fetch(
+      `/.netlify/functions/link-preview?url=${encodeURIComponent(url)}`
+    );
+    if (!response.ok) {
+      return { title: "", image: "" };
+    }
+    return await response.json();
+  } catch (error) {
+    return { title: "", image: "" };
+  }
+};
+
 const applyEditableState = (enabled) => {
   document.body.classList.toggle("edit-mode", enabled);
   document.querySelectorAll("[data-editable]").forEach((element) => {
@@ -218,6 +235,11 @@ const renderAnnouncements = (docs) => {
     const linkMarkup = data.linkUrl
       ? `
         <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
+          ${
+            data.linkImage
+              ? `<img class="link-thumb" src="${data.linkImage}" alt="" loading="lazy" />`
+              : ""
+          }
           <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
           <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
         </a>
@@ -256,6 +278,11 @@ const renderMessages = (docs) => {
     const linkMarkup = data.linkUrl
       ? `
         <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
+          ${
+            data.linkImage
+              ? `<img class="link-thumb" src="${data.linkImage}" alt="" loading="lazy" />`
+              : ""
+          }
           <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
           <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
         </a>
@@ -291,6 +318,11 @@ const renderEvents = (docs) => {
     const linkMarkup = data.linkUrl
       ? `
         <a class="link-card" href="${data.linkUrl}" target="_blank" rel="noreferrer">
+          ${
+            data.linkImage
+              ? `<img class="link-thumb" src="${data.linkImage}" alt="" loading="lazy" />`
+              : ""
+          }
           <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
           <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
         </a>
@@ -321,6 +353,11 @@ const renderList = (key, docs) => {
     const linkMarkup = data.linkUrl
       ? `
         <a class="link-card small" href="${data.linkUrl}" target="_blank" rel="noreferrer">
+          ${
+            data.linkImage
+              ? `<img class="link-thumb" src="${data.linkImage}" alt="" loading="lazy" />`
+              : ""
+          }
           <span class="link-title" data-editable="true" data-field="linkTitle">${data.linkTitle || data.linkUrl}</span>
           <span class="link-url" data-editable="true" data-field="linkUrl">${data.linkUrl}</span>
         </a>
@@ -445,6 +482,9 @@ const wirePostForm = () => {
     const authorEmail = currentUser.email || null;
     const linkTitle = postLinkTitle?.value?.trim() || "";
     const linkUrl = normalizeUrl(postLinkUrl?.value?.trim() || "");
+    const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
+    const resolvedLinkTitle = linkTitle || preview.title || "";
+    const resolvedLinkImage = preview.image || "";
 
     if (type === "shows" || type === "auditions") {
       const text = postListItem?.value?.trim() || "";
@@ -455,8 +495,9 @@ const wirePostForm = () => {
       try {
         await db.collection(type).add({
           text,
-          linkTitle,
+          linkTitle: resolvedLinkTitle,
           linkUrl,
+          linkImage: resolvedLinkImage,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           authorName,
           authorEmail,
@@ -489,8 +530,9 @@ const wirePostForm = () => {
       await db.collection(type).add({
         title,
         body,
-        linkTitle,
+        linkTitle: resolvedLinkTitle,
         linkUrl,
+        linkImage: resolvedLinkImage,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName,
         authorEmail,
@@ -592,11 +634,15 @@ const addItem = async (type) => {
     }
     const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
     const linkTitle = linkUrl ? prompt("Optional link title") || "" : "";
+      const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
+      const resolvedLinkTitle = linkTitle || preview.title || "";
+      const resolvedLinkImage = preview.image || "";
     try {
       await db.collection(type).add({
         text,
-        linkTitle,
-        linkUrl,
+          linkTitle: resolvedLinkTitle,
+          linkUrl,
+          linkImage: resolvedLinkImage,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName: currentUser?.displayName || currentUser?.email || "Member",
         authorEmail: currentUser?.email || null,
@@ -619,13 +665,17 @@ const addItem = async (type) => {
   }
   const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
   const linkTitle = linkUrl ? prompt("Optional link title") || "" : "";
+  const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
+  const resolvedLinkTitle = linkTitle || preview.title || "";
+  const resolvedLinkImage = preview.image || "";
 
   try {
     await db.collection(type).add({
       title,
       body,
-      linkTitle,
+      linkTitle: resolvedLinkTitle,
       linkUrl,
+      linkImage: resolvedLinkImage,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       authorName: currentUser?.displayName || currentUser?.email || "Member",
       authorEmail: currentUser?.email || null,

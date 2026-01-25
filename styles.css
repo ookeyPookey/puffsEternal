@@ -478,6 +478,9 @@ main {
   border: 1px solid #e6c45c;
   background: #fff2bf;
   color: #2c1b0f;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  align-items: center;
 }
 
 .link-card.small {
@@ -486,8 +489,26 @@ main {
   font-size: 12px;
 }
 
+.link-card.small .link-thumb {
+  width: 40px;
+  height: 40px;
+}
+
+.link-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e6c45c;
+}
+
 .link-title {
   font-weight: 600;
+}
+
+.link-card .link-title,
+.link-card .link-url {
+  grid-column: 2;
 }
 
 .link-url {
