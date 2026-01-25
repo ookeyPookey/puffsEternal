@@ -23,6 +23,9 @@ const postListField = document.getElementById("postListField");
 const postTitle = document.getElementById("postTitle");
 const postBody = document.getElementById("postBody");
 const postListItem = document.getElementById("postListItem");
+const postDateField = document.getElementById("postDateField");
+const postDate = document.getElementById("postDate");
+const postImageUrl = document.getElementById("postImageUrl");
 const postLinkTitle = document.getElementById("postLinkTitle");
 const postLinkUrl = document.getElementById("postLinkUrl");
 const postName = postForm?.querySelector('input[name="name"]');
@@ -151,6 +154,21 @@ const formatDate = (timestamp) => {
   });
 };
 
+const formatEventDate = (dateString) => {
+  if (!dateString) {
+    return "";
+  }
+  const date = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 const normalizeUrl = (url) => {
   if (!url) {
     return "";
@@ -216,6 +234,7 @@ const updatePostFields = () => {
   }
   const type = postType.value;
   const isListType = type === "shows" || type === "auditions";
+  const requiresDate = type === "shows" || type === "auditions" || type === "events";
   if (postTitleField) {
     postTitleField.hidden = isListType;
   }
@@ -224,6 +243,10 @@ const updatePostFields = () => {
   }
   if (postListField) {
     postListField.hidden = !isListType;
+  }
+  if (postDateField && postDate) {
+    postDateField.hidden = !requiresDate;
+    postDate.required = requiresDate;
   }
 };
 
@@ -239,7 +262,13 @@ const renderAnnouncements = (docs) => {
       ? `Posted by ${data.authorName} · ${formatDate(data.createdAt)}`
       : formatDate(data.createdAt);
     const card = document.createElement("article");
-    card.className = "card";
+    const backgroundImage = data.imageUrl
+      ? buildProxyImageUrl(data.imageUrl)
+      : "";
+    card.className = `card${backgroundImage ? " media-card" : ""}`;
+    if (backgroundImage) {
+      card.style.setProperty("--card-image", `url("${backgroundImage}")`);
+    }
     card.dataset.docId = doc.id;
     card.dataset.itemType = "announcements";
     const imageUrl = data.linkImage
@@ -255,14 +284,24 @@ const renderAnnouncements = (docs) => {
       `
       : "";
     card.innerHTML = `
-      <h3 data-editable="true" data-field="title">${data.title || ""}</h3>
-      <p data-editable="true" data-field="body">${data.body || ""}</p>
-      ${linkMarkup}
-      <div class="meta">${meta}</div>
-      <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="announcements">
-        Delete
-      </button>
+      <div class="media-content">
+        <h3 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h3>
+        <p class="media-body" data-editable="true" data-field="body">${data.body || ""}</p>
+        ${linkMarkup}
+        <div class="meta">${meta}</div>
+        <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="announcements">
+          Delete
+        </button>
+      </div>
     `;
+    if (data.authorPhoto) {
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = data.authorPhoto;
+      avatar.alt = `${data.authorName || "Member"} avatar`;
+      avatar.loading = "lazy";
+      card.appendChild(avatar);
+    }
     container.appendChild(card);
   });
   setEmptyState("announcements", docs.length > 0);
@@ -281,7 +320,13 @@ const renderMessages = (docs) => {
       ? `${data.authorName} · ${formatDate(data.createdAt)}`
       : formatDate(data.createdAt);
     const message = document.createElement("div");
-    message.className = "message";
+    const backgroundImage = data.imageUrl
+      ? buildProxyImageUrl(data.imageUrl)
+      : "";
+    message.className = `message${backgroundImage ? " media-card" : ""}`;
+    if (backgroundImage) {
+      message.style.setProperty("--card-image", `url("${backgroundImage}")`);
+    }
     message.dataset.docId = doc.id;
     message.dataset.itemType = "messages";
     const imageUrl = data.linkImage
@@ -297,14 +342,24 @@ const renderMessages = (docs) => {
       `
       : "";
     message.innerHTML = `
-      <h4 data-editable="true" data-field="title">${data.title || ""}</h4>
-      <p data-editable="true" data-field="body">${data.body || ""}</p>
-      ${linkMarkup}
-      <span class="meta">${meta}</span>
-      <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="messages">
-        Delete
-      </button>
+      <div class="media-content">
+        <h4 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h4>
+        <p class="media-body" data-editable="true" data-field="body">${data.body || ""}</p>
+        ${linkMarkup}
+        <span class="meta">${meta}</span>
+        <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="messages">
+          Delete
+        </button>
+      </div>
     `;
+    if (data.authorPhoto) {
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = data.authorPhoto;
+      avatar.alt = `${data.authorName || "Member"} avatar`;
+      avatar.loading = "lazy";
+      message.appendChild(avatar);
+    }
     container.appendChild(message);
   });
   setEmptyState("messages", docs.length > 0);
@@ -320,9 +375,18 @@ const renderEvents = (docs) => {
   docs.forEach((doc) => {
     const data = doc.data();
     const eventItem = document.createElement("div");
-    eventItem.className = "timeline-item";
+    const backgroundImage = data.imageUrl
+      ? buildProxyImageUrl(data.imageUrl)
+      : "";
+    eventItem.className = `timeline-item${backgroundImage ? " media-card" : ""}`;
+    if (backgroundImage) {
+      eventItem.style.setProperty("--card-image", `url("${backgroundImage}")`);
+    }
     eventItem.dataset.docId = doc.id;
     eventItem.dataset.itemType = "events";
+    const dateBadge = data.eventDate
+      ? `<span class="date-badge">${formatEventDate(data.eventDate)}</span>`
+      : "";
     const imageUrl = data.linkImage
       ? buildProxyImageUrl(data.linkImage)
       : "";
@@ -336,13 +400,24 @@ const renderEvents = (docs) => {
       `
       : "";
     eventItem.innerHTML = `
-      <h4 data-editable="true" data-field="title">${data.title || ""}</h4>
-      <p data-editable="true" data-field="body">${data.body || ""}</p>
-      ${linkMarkup}
-      <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="events">
-        Delete
-      </button>
+      ${dateBadge}
+      <div class="media-content">
+        <h4 class="media-title" data-editable="true" data-field="title">${data.title || ""}</h4>
+        <p class="media-body" data-editable="true" data-field="body">${data.body || ""}</p>
+        ${linkMarkup}
+        <button class="delete-button" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="events">
+          Delete
+        </button>
+      </div>
     `;
+    if (data.authorPhoto) {
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = data.authorPhoto;
+      avatar.alt = `${data.authorName || "Member"} avatar`;
+      avatar.loading = "lazy";
+      eventItem.appendChild(avatar);
+    }
     container.appendChild(eventItem);
   });
   setEmptyState("events", docs.length > 0);
@@ -357,6 +432,12 @@ const renderList = (key, docs) => {
   list.innerHTML = "";
   docs.forEach((doc) => {
     const data = doc.data();
+    const backgroundImage = data.imageUrl
+      ? buildProxyImageUrl(data.imageUrl)
+      : "";
+    const dateBadge = data.eventDate
+      ? `<span class="date-badge">${formatEventDate(data.eventDate)}</span>`
+      : "";
     const imageUrl = data.linkImage
       ? buildProxyImageUrl(data.linkImage)
       : "";
@@ -372,13 +453,30 @@ const renderList = (key, docs) => {
     const li = document.createElement("li");
     li.dataset.docId = doc.id;
     li.dataset.itemType = key;
+    if (backgroundImage) {
+      li.className = "list-card media-card";
+      li.style.setProperty("--card-image", `url("${backgroundImage}")`);
+    } else {
+      li.className = "list-card";
+    }
     li.innerHTML = `
-      <span data-editable="true" data-field="text">${data.text || ""}</span>
-      ${linkMarkup}
-      <button class="delete-button small" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="${key}">
-        Delete
-      </button>
+      ${dateBadge}
+      <div class="media-content">
+        <span class="media-title" data-editable="true" data-field="text">${data.text || ""}</span>
+        ${linkMarkup}
+        <button class="delete-button small" type="button" data-action="delete" data-doc-id="${doc.id}" data-item-type="${key}">
+          Delete
+        </button>
+      </div>
     `;
+    if (data.authorPhoto) {
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = data.authorPhoto;
+      avatar.alt = `${data.authorName || "Member"} avatar`;
+      avatar.loading = "lazy";
+      li.appendChild(avatar);
+    }
     list.appendChild(li);
   });
   setEmptyState(key, docs.length > 0);
@@ -486,8 +584,16 @@ const wirePostForm = () => {
       currentUser.email ||
       "Member";
     const authorEmail = currentUser.email || null;
+    const authorPhoto = currentUser.photoURL || "";
     const linkTitle = postLinkTitle?.value?.trim() || "";
     const linkUrl = normalizeUrl(postLinkUrl?.value?.trim() || "");
+    const imageUrl = normalizeUrl(postImageUrl?.value?.trim() || "");
+    const eventDate = postDate?.value?.trim() || "";
+    const requiresDate = type === "shows" || type === "auditions" || type === "events";
+    if (requiresDate && !eventDate) {
+      showToast("Please add a date.");
+      return;
+    }
     const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
     const resolvedLinkTitle = linkTitle || preview.title || "";
     const resolvedLinkImage = preview.image || "";
@@ -504,12 +610,21 @@ const wirePostForm = () => {
           linkTitle: resolvedLinkTitle,
           linkUrl,
           linkImage: resolvedLinkImage,
+          imageUrl,
+          eventDate,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           authorName,
           authorEmail,
+          authorPhoto,
         });
         if (postListItem) {
           postListItem.value = "";
+        }
+        if (postDate) {
+          postDate.value = "";
+        }
+        if (postImageUrl) {
+          postImageUrl.value = "";
         }
         if (postLinkTitle) {
           postLinkTitle.value = "";
@@ -539,15 +654,24 @@ const wirePostForm = () => {
         linkTitle: resolvedLinkTitle,
         linkUrl,
         linkImage: resolvedLinkImage,
+        imageUrl,
+        eventDate,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName,
         authorEmail,
+        authorPhoto,
       });
       if (postTitle) {
         postTitle.value = "";
       }
       if (postBody) {
         postBody.value = "";
+      }
+      if (postDate) {
+        postDate.value = "";
+      }
+      if (postImageUrl) {
+        postImageUrl.value = "";
       }
       if (postLinkTitle) {
         postLinkTitle.value = "";
@@ -638,8 +762,14 @@ const addItem = async (type) => {
     if (!text) {
       return;
     }
+      const eventDate = prompt("Date (required, e.g. 2026-02-10)") || "";
+      if (!eventDate) {
+        showToast("Date is required.");
+        return;
+      }
     const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
     const linkTitle = linkUrl ? prompt("Optional link title") || "" : "";
+      const imageUrl = normalizeUrl(prompt("Optional image URL") || "");
       const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
       const resolvedLinkTitle = linkTitle || preview.title || "";
       const resolvedLinkImage = preview.image || "";
@@ -649,9 +779,12 @@ const addItem = async (type) => {
           linkTitle: resolvedLinkTitle,
           linkUrl,
           linkImage: resolvedLinkImage,
+          imageUrl,
+          eventDate,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName: currentUser?.displayName || currentUser?.email || "Member",
         authorEmail: currentUser?.email || null,
+          authorPhoto: currentUser?.photoURL || "",
       });
       showToast("Added.");
     } catch (error) {
@@ -669,8 +802,14 @@ const addItem = async (type) => {
   if (!body) {
     return;
   }
+  const eventDate = type === "events" ? prompt("Date (required, e.g. 2026-02-10)") || "" : "";
+  if (type === "events" && !eventDate) {
+    showToast("Date is required.");
+    return;
+  }
   const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
   const linkTitle = linkUrl ? prompt("Optional link title") || "" : "";
+  const imageUrl = normalizeUrl(prompt("Optional image URL") || "");
   const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
   const resolvedLinkTitle = linkTitle || preview.title || "";
   const resolvedLinkImage = preview.image || "";
@@ -682,9 +821,12 @@ const addItem = async (type) => {
       linkTitle: resolvedLinkTitle,
       linkUrl,
       linkImage: resolvedLinkImage,
+      imageUrl,
+      eventDate,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       authorName: currentUser?.displayName || currentUser?.email || "Member",
       authorEmail: currentUser?.email || null,
+      authorPhoto: currentUser?.photoURL || "",
     });
     showToast("Added.");
   } catch (error) {
@@ -717,12 +859,16 @@ const seedDemoContent = async () => {
         authorName: "Alex",
           linkTitle: "Tickets and info",
           linkUrl: "https://example.com",
+          imageUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf",
+          authorPhoto: "",
       }),
       db.collection("announcements").add({
         title: "Congrats, castmates",
         body: "Shoutout to everyone who booked winter gigs.",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName: "Kieran",
+          imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+          authorPhoto: "",
       }),
       db.collection("messages").add({
         title: "Looking for a reader?",
@@ -731,6 +877,8 @@ const seedDemoContent = async () => {
         authorName: "Riley",
           linkTitle: "RSVP",
           linkUrl: "https://example.com",
+          imageUrl: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef",
+          authorPhoto: "",
       }),
       db.collection("events").add({
         title: "Jan 24 · Opening night meet-up",
@@ -738,18 +886,27 @@ const seedDemoContent = async () => {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           linkTitle: "Event info",
           linkUrl: "https://example.com",
+          eventDate: "2026-01-24",
+          imageUrl: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4",
+          authorPhoto: "",
       }),
       db.collection("shows").add({
         text: '"The Enchanted Forest" — Feb 2-18',
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           linkTitle: "Tickets",
           linkUrl: "https://example.com",
+          eventDate: "2026-02-02",
+          imageUrl: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+          authorPhoto: "",
       }),
       db.collection("auditions").add({
         text: "City Players — submissions due Jan 20",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           linkTitle: "Audition packet",
           linkUrl: "https://example.com",
+          eventDate: "2026-01-20",
+          imageUrl: "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+          authorPhoto: "",
       }),
     ]);
 

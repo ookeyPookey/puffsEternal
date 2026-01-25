@@ -540,6 +540,83 @@ main {
   border: 1px solid #e9cd73;
 }
 
+.media-card {
+  color: #fff;
+  background: #2c1b0f;
+  background-image: var(--card-image);
+  background-size: cover;
+  background-position: center;
+  min-height: 220px;
+}
+
+.media-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 8, 6, 0.2) 0%, rgba(10, 8, 6, 0.8) 70%);
+  z-index: 0;
+}
+
+.media-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+  height: 100%;
+  align-content: end;
+  padding-top: 40px;
+}
+
+.media-title {
+  font-size: 20px;
+  color: #fff;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+.media-body {
+  color: #f8f2dc;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.avatar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid #f8d66d;
+  object-fit: cover;
+  z-index: 2;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.date-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(44, 27, 15, 0.85);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 2;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.list-card {
+  list-style: none;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid #e9cd73;
+  background: #fff7da;
+  position: relative;
+  overflow: hidden;
+}
+
 .contact-form {
   display: grid;
   gap: 16px;
