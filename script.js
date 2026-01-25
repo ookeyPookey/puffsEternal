@@ -818,7 +818,9 @@ const saveEdits = async () => {
 
   const updates = [];
 
-  document.querySelectorAll("[data-doc-id]").forEach((element) => {
+  document
+    .querySelectorAll('[data-doc-id]:not([data-action="delete"])')
+    .forEach((element) => {
     const docId = element.dataset.docId;
     const type = element.dataset.itemType;
     if (!docId || !type) {

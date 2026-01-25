@@ -7,9 +7,12 @@ service cloud.firestore {
 
     function isEditor() {
       return isSignedIn()
-        && request.auth.token.email in [
-          "you@example.com"
-        ];
+        && (
+          request.auth.token.email in [
+            "you@example.com"
+          ] ||
+          exists(/databases/$(database)/documents/editorInvites/$(request.auth.token.email))
+        );
     }
 
     match /editorInvites/{email} {
