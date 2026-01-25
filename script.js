@@ -875,8 +875,9 @@ const saveEdits = async () => {
     showToast("Saved for everyone.");
     toggleEditMode(false);
   } catch (error) {
-    showToast("Save failed. Check your permissions.");
-    console.error(error);
+    const code = error?.code || "unknown";
+    showToast(`Save failed (${code}).`);
+    console.error("Save failed", error);
   }
 };
 
