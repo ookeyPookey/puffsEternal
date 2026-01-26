@@ -210,6 +210,22 @@ const formatEventDate = (dateString) => {
   });
 };
 
+const formatEventTime = (timeString) => {
+  if (!timeString) {
+    return "";
+  }
+  const [hours, minutes] = timeString.split(":").map(Number);
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    return timeString;
+  }
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+  return date.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
 const normalizeUrl = (url) => {
   if (!url) {
     return "";
@@ -466,7 +482,8 @@ const renderEvents = (docs) => {
     if (data.eventDate) {
       const badge = document.createElement("span");
       badge.className = "date-badge";
-      badge.textContent = formatEventDate(data.eventDate);
+      const timeText = data.eventTime ? ` · ${formatEventTime(data.eventTime)}` : "";
+      badge.textContent = `${formatEventDate(data.eventDate)}${timeText}`;
       eventItem.appendChild(badge);
     }
 
@@ -546,7 +563,8 @@ const renderList = (key, docs) => {
     if (data.eventDate) {
       const badge = document.createElement("span");
       badge.className = "date-badge";
-      badge.textContent = formatEventDate(data.eventDate);
+      const timeText = data.eventTime ? ` · ${formatEventTime(data.eventTime)}` : "";
+      badge.textContent = `${formatEventDate(data.eventDate)}${timeText}`;
       li.appendChild(badge);
     }
     const content = document.createElement("div");
