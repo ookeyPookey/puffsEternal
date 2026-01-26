@@ -7,6 +7,7 @@ body {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   color: #1d1e22;
   background: radial-gradient(circle at top, #fff8dc, #f7e3a1 55%, #f0d27a);
+  position: relative;
 }
 
 body::before {
@@ -18,7 +19,7 @@ body::before {
     radial-gradient(circle at 90% 15%, rgba(255, 255, 255, 0.4), transparent 50%),
     radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.4), transparent 55%);
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
 body::after {
@@ -46,9 +47,14 @@ body::after {
     );
   background-size: auto, auto, auto, auto, 100% 100%, 100% 100%;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
   opacity: 0.65;
   mix-blend-mode: multiply;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 a {
