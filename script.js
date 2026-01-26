@@ -39,7 +39,6 @@ const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
 
 const collections = {
   announcements: "announcements",
-  messages: "messages",
   events: "events",
   shows: "shows",
   auditions: "auditions",
@@ -329,7 +328,6 @@ const clearContainers = () => {
     list.innerHTML = "";
   });
   setEmptyState("announcements", false);
-  setEmptyState("messages", false);
   setEmptyState("events", false);
   setEmptyState("shows", false);
   setEmptyState("auditions", false);
@@ -432,80 +430,6 @@ const renderAnnouncements = (docs) => {
   applyEditableState(document.body.classList.contains("edit-mode"));
 };
 
-const renderMessages = (docs) => {
-  const container = document.querySelector('[data-container="messages"]');
-  if (!container) {
-    return;
-  }
-  container.innerHTML = "";
-  docs.forEach((doc) => {
-    const data = doc.data();
-    const metaText = data.authorName
-      ? `${data.authorName} · ${formatDate(data.createdAt)}`
-      : formatDate(data.createdAt);
-    const message = document.createElement("div");
-    const backgroundImage = data.imageUrl
-      ? buildProxyImageUrl(data.imageUrl)
-      : "";
-    message.className = `message${backgroundImage ? " media-card" : ""}`;
-    message.dataset.docId = doc.id;
-    message.dataset.itemType = "messages";
-    message.dataset.authorEmail = data.authorEmail || "";
-
-    if (backgroundImage) {
-      const mediaImage = document.createElement("img");
-      mediaImage.className = "media-image";
-      mediaImage.src = backgroundImage;
-      mediaImage.alt = "";
-      mediaImage.loading = "lazy";
-      message.appendChild(mediaImage);
-    }
-
-    const content = document.createElement("div");
-    content.className = "media-content";
-    content.appendChild(
-      createTextEl("h4", "media-title", data.title, {
-        "data-editable": "true",
-        "data-field": "title",
-      })
-    );
-    content.appendChild(
-      createTextEl("p", "media-body", data.body, {
-        "data-editable": "true",
-        "data-field": "body",
-      })
-    );
-    const linkCard = buildLinkCard(data);
-    if (linkCard) {
-      content.appendChild(linkCard);
-    }
-    content.appendChild(createTextEl("span", "meta", metaText));
-
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "delete-button";
-    deleteButton.type = "button";
-    deleteButton.dataset.action = "delete";
-    deleteButton.dataset.docId = doc.id;
-    deleteButton.dataset.itemType = "messages";
-    deleteButton.dataset.authorEmail = data.authorEmail || "";
-    deleteButton.textContent = "Delete";
-    content.appendChild(deleteButton);
-
-    message.appendChild(content);
-
-    if (data.authorPhoto) {
-      const avatar = document.createElement("img");
-      avatar.className = "avatar";
-      avatar.src = data.authorPhoto;
-      avatar.alt = `${data.authorName || "Member"} avatar`;
-      avatar.loading = "lazy";
-      message.appendChild(avatar);
-    }
-    container.appendChild(message);
-  });
-  setEmptyState("messages", docs.length > 0);
-  applyEditableState(document.body.classList.contains("edit-mode"));
-};
 
 const renderEvents = (docs) => {
   const container = document.querySelector('[data-container="events"]');
@@ -666,10 +590,6 @@ const startListeners = () => {
       .collection(collections.announcements)
       .orderBy("createdAt", "desc")
       .onSnapshot((snapshot) => renderAnnouncements(snapshot.docs)),
-    db
-      .collection(collections.messages)
-      .orderBy("createdAt", "desc")
-      .onSnapshot((snapshot) => renderMessages(snapshot.docs)),
     db
       .collection(collections.events)
       .orderBy("createdAt", "asc")
@@ -1022,13 +942,12 @@ const seedDemoContent = async () => {
     return;
   }
   try {
-    const [announcementsSnap, messagesSnap, eventsSnap] = await Promise.all([
+    const [announcementsSnap, eventsSnap] = await Promise.all([
       db.collection("announcements").limit(1).get(),
-      db.collection("messages").limit(1).get(),
       db.collection("events").limit(1).get(),
     ]);
 
-    if (!announcementsSnap.empty || !messagesSnap.empty || !eventsSnap.empty) {
+    if (!announcementsSnap.empty || !eventsSnap.empty) {
       showToast("Demo content already exists.");
       return;
     }
@@ -1050,16 +969,6 @@ const seedDemoContent = async () => {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName: "Kieran",
           imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-          authorPhoto: "",
-      }),
-      db.collection("messages").add({
-        title: "Looking for a reader?",
-        body: "I need a scene partner this Thursday evening. Anyone up for it?",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        authorName: "Riley",
-          linkTitle: "RSVP",
-          linkUrl: "https://example.com",
-          imageUrl: "https://images.unsplash.com/photo-1489515217757-5fd1be406fef",
           authorPhoto: "",
       }),
       db.collection("events").add({

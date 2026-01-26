@@ -32,7 +32,6 @@
         </a>
         <div class="nav-links">
           <a href="#announcements">Announcements</a>
-          <a href="#messages">Messages</a>
           <a href="#plays">Plays & Auditions</a>
           <a href="#events">Events</a>
           <a href="calendar.html">Calendar</a>
@@ -43,7 +42,6 @@
             <button class="user-menu-toggle" id="userMenuToggle" type="button">
               <img class="user-avatar" id="userAvatar" alt="" />
               <span class="user-name" id="userName">Signed in</span>
-              <span class="user-chevron" aria-hidden="true">▾</span>
             </button>
             <div class="user-menu-dropdown" id="userMenu" role="menu">
               <button class="user-menu-item" type="button" id="userSettingsBtn">
@@ -69,9 +67,6 @@
         </button>
         <button class="button small" type="button" data-add="announcements">
           New announcement
-        </button>
-        <button class="button small" type="button" data-add="messages">
-          New message
         </button>
         <button class="button small" type="button" data-add="events">
           New event
@@ -135,8 +130,8 @@
             </div>
           </div>
           <p class="lead">
-            Share announcements, message each other, post about shows and
-            auditions, and coordinate events in one cozy, chaos-friendly space.
+            Share announcements, post about shows and auditions, and coordinate
+            events in one cozy, chaos-friendly space.
           </p>
           <div class="hero-actions" data-auth="signed-in">
             <a class="button primary" href="#announcements">See updates</a>
@@ -166,7 +161,6 @@
           </div>
           <div class="hero-tags">
             <span>Announcements</span>
-            <span>Messages</span>
             <span>Shows</span>
             <span>Auditions</span>
             <span>Events</span>
@@ -216,20 +210,6 @@
         </p>
       </section>
 
-      <section id="messages" class="section alt">
-        <div class="section-header">
-          <h2>Messages</h2>
-          <p>Quick notes and hellos from the crew.</p>
-        </div>
-        <div class="message-board" data-container="messages" data-auth="signed-in">
-        </div>
-        <p class="empty-state" data-empty="messages" data-auth="signed-in">
-          No messages yet. Editors can post a hello.
-        </p>
-        <p class="empty-state" data-auth="signed-out">
-          Sign in to see and post messages.
-        </p>
-      </section>
 
       <section id="plays" class="section">
         <div class="section-header">
@@ -289,7 +269,6 @@
             What kind of update is this?
             <select name="type" id="postType">
               <option value="announcements">Announcement</option>
-              <option value="messages">Message</option>
               <option value="events">Event</option>
               <option value="shows">Play / show</option>
               <option value="auditions">Audition</option>
