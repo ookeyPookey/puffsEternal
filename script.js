@@ -31,6 +31,8 @@ const postBody = document.getElementById("postBody");
 const postListItem = document.getElementById("postListItem");
 const postDateField = document.getElementById("postDateField");
 const postDate = document.getElementById("postDate");
+const postTimeField = document.getElementById("postTimeField");
+const postTime = document.getElementById("postTime");
 const postImageUrl = document.getElementById("postImageUrl");
 const postLinkUrl = document.getElementById("postLinkUrl");
 const postName = postForm?.querySelector('input[name="name"]');
@@ -352,6 +354,10 @@ const updatePostFields = () => {
   if (postDateField && postDate) {
     postDateField.hidden = !requiresDate;
     postDate.required = requiresDate;
+  }
+  if (postTimeField && postTime) {
+    postTimeField.hidden = !requiresDate;
+    postTime.required = requiresDate;
   }
 };
 
@@ -691,9 +697,14 @@ const wirePostForm = () => {
     const linkUrl = normalizeUrl(postLinkUrl?.value?.trim() || "");
     const imageUrl = normalizeUrl(postImageUrl?.value?.trim() || "");
     const eventDate = postDate?.value?.trim() || "";
+    const eventTime = postTime?.value?.trim() || "";
     const requiresDate = type === "shows" || type === "auditions" || type === "events";
     if (requiresDate && !eventDate) {
       showToast("Please add a date.");
+      return;
+    }
+    if (requiresDate && !eventTime) {
+      showToast("Please add a start time.");
       return;
     }
     const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
@@ -714,6 +725,7 @@ const wirePostForm = () => {
           linkImage: resolvedLinkImage,
           imageUrl,
           eventDate,
+          eventTime,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           authorName,
           authorEmail,
@@ -724,6 +736,9 @@ const wirePostForm = () => {
         }
         if (postDate) {
           postDate.value = "";
+        }
+        if (postTime) {
+          postTime.value = "";
         }
         if (postImageUrl) {
           postImageUrl.value = "";
@@ -755,6 +770,7 @@ const wirePostForm = () => {
         linkImage: resolvedLinkImage,
         imageUrl,
         eventDate,
+        eventTime,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName,
         authorEmail,
@@ -768,6 +784,9 @@ const wirePostForm = () => {
       }
       if (postDate) {
         postDate.value = "";
+      }
+      if (postTime) {
+        postTime.value = "";
       }
       if (postImageUrl) {
         postImageUrl.value = "";
@@ -871,6 +890,11 @@ const addItem = async (type) => {
         showToast("Date is required.");
         return;
       }
+      const eventTime = prompt("Start time (required, e.g. 19:30)") || "";
+      if (!eventTime) {
+        showToast("Start time is required.");
+        return;
+      }
     const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
       const imageUrl = normalizeUrl(prompt("Optional image URL") || "");
       const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
@@ -884,6 +908,7 @@ const addItem = async (type) => {
           linkImage: resolvedLinkImage,
           imageUrl,
           eventDate,
+          eventTime,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         authorName: currentUser?.displayName || currentUser?.email || "Member",
         authorEmail: currentUser?.email || null,
@@ -910,6 +935,12 @@ const addItem = async (type) => {
     showToast("Date is required.");
     return;
   }
+  const eventTime =
+    type === "events" ? prompt("Start time (required, e.g. 19:30)") || "" : "";
+  if (type === "events" && !eventTime) {
+    showToast("Start time is required.");
+    return;
+  }
   const linkUrl = normalizeUrl(prompt("Optional link URL") || "");
   const imageUrl = normalizeUrl(prompt("Optional image URL") || "");
   const preview = linkUrl ? await fetchLinkPreview(linkUrl) : { title: "", image: "" };
@@ -925,6 +956,7 @@ const addItem = async (type) => {
       linkImage: resolvedLinkImage,
       imageUrl,
       eventDate,
+      eventTime,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       authorName: currentUser?.displayName || currentUser?.email || "Member",
       authorEmail: currentUser?.email || null,

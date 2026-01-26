@@ -48,12 +48,29 @@ const formatEventDate = (dateString) => {
   });
 };
 
+const formatEventTime = (timeString) => {
+  if (!timeString) {
+    return "";
+  }
+  const [hours, minutes] = timeString.split(":").map(Number);
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    return timeString;
+  }
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+  return date.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
 const buildCard = (item) => {
   const card = document.createElement("article");
   card.className = "card";
+  const timeText = item.eventTime ? ` · ${formatEventTime(item.eventTime)}` : "";
 
   const title = document.createElement("h3");
-  title.textContent = `${formatEventDate(item.eventDate)} · ${item.title}`;
+  title.textContent = `${formatEventDate(item.eventDate)}${timeText} · ${item.title}`;
   card.appendChild(title);
 
   if (item.body) {
@@ -125,7 +142,8 @@ const renderCalendar = (items) => {
     list.className = "list";
     monthItems.forEach((item) => {
       const li = document.createElement("li");
-      li.textContent = `${formatEventDate(item.eventDate)} · ${item.title}`;
+      const time = item.eventTime ? ` · ${formatEventTime(item.eventTime)}` : "";
+      li.textContent = `${formatEventDate(item.eventDate)}${time} · ${item.title}`;
       list.appendChild(li);
     });
     card.appendChild(list);
@@ -200,6 +218,7 @@ const startListeners = () => {
         id: doc.id,
         typeLabel,
         eventDate: data.eventDate,
+        eventTime: data.eventTime || "",
         title: data.title || data.text || "Untitled",
         body: data.body || "",
         linkTitle: data.linkTitle || "",
@@ -211,7 +230,11 @@ const startListeners = () => {
   const refresh = () => {
     const sorted = items
       .filter((item) => item.eventDate)
-      .sort((a, b) => new Date(a.eventDate) - new Date(b.eventDate));
+      .sort((a, b) => {
+        const aKey = `${item.eventDate}T${item.eventTime || "00:00"}`;
+        const bKey = `${item.eventDate}T${item.eventTime || "00:00"}`;
+        return new Date(aKey) - new Date(bKey);
+      });
     currentItems = sorted;
     updateMonthOptions(sorted);
     applyFilters();
