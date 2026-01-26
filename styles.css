@@ -578,52 +578,25 @@ main {
   opacity: 0.6;
 }
 
-.link-card {
-  display: grid;
-  gap: 4px;
-  margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid #e6c45c;
-  background: #fff2bf;
-  color: #2c1b0f;
-  grid-template-columns: auto 1fr;
-  column-gap: 10px;
+.link-icon {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(248, 214, 109, 0.6);
+  background: rgba(44, 27, 15, 0.65);
+  color: #fff;
+  font-size: 16px;
+  text-decoration: none;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
 
-.link-card.small {
-  margin-top: 8px;
-  padding: 8px 10px;
-  font-size: 12px;
-}
-
-.link-card.small .link-thumb {
-  width: 40px;
-  height: 40px;
-}
-
-.link-thumb {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid #e6c45c;
-}
-
-.link-title {
-  font-weight: 600;
-}
-
-.link-card .link-title,
-.link-card .link-url {
-  grid-column: 2;
-}
-
-.link-url {
-  font-size: 12px;
-  color: #6b4b2a;
-  word-break: break-all;
+.link-icon.small {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
 }
 
 .split {

@@ -272,35 +272,15 @@ const buildLinkCard = (data, isSmall = false) => {
   if (!href) {
     return null;
   }
-  const card = document.createElement("a");
-  card.className = `link-card${isSmall ? " small" : ""}`;
-  card.href = href;
-  card.target = "_blank";
-  card.rel = "noreferrer";
-
-  if (data.linkImage) {
-    const thumb = document.createElement("img");
-    thumb.className = "link-thumb";
-    thumb.src = buildProxyImageUrl(data.linkImage);
-    thumb.alt = "";
-    thumb.loading = "lazy";
-    card.appendChild(thumb);
-  }
-
-  const titleText = data.linkTitle || href;
-  card.appendChild(
-    createTextEl("span", "link-title", titleText, {
-      "data-editable": "true",
-      "data-field": "linkTitle",
-    })
-  );
-  card.appendChild(
-    createTextEl("span", "link-url", href, {
-      "data-editable": "true",
-      "data-field": "linkUrl",
-    })
-  );
-  return card;
+  const link = document.createElement("a");
+  link.className = `link-icon${isSmall ? " small" : ""}`;
+  link.href = href;
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  link.title = data.linkTitle || "More info";
+  link.setAttribute("aria-label", data.linkTitle || "More info");
+  link.textContent = "↗";
+  return link;
 };
 
 const fetchLinkPreview = async (url) => {
